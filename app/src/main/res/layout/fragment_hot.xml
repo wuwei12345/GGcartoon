@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.handmark.pulltorefresh.library.PullToRefreshScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/hot_pulltorefresh"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_height="150dp">
+        <android.support.v4.view.ViewPager
+            android:id="@+id/head_vp"
+            android:layout_width="match_parent"
+
+            android:layout_height="150dp">
+        </android.support.v4.view.ViewPager>
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_alignParentBottom="true"
+            android:textSize="16sp"
+            android:textColor="#ffffff"
+            />
+    </RelativeLayout>
+<ggcartoon.yztc.com.View.MyGirdView
+    android:id="@+id/hot_gird_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:horizontalSpacing="3dp"
+    android:numColumns="3"
+    android:padding="3dp"
+    android:layout_margin="3dp"
+    android:verticalSpacing="3dp"
+    android:listSelector="#00000000"
+   />
+</LinearLayout>
+    <ProgressBar
+        android:id="@+id/hot_pb"
+        android:visibility="invisible"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</RelativeLayout>
+
+</com.handmark.pulltorefresh.library.PullToRefreshScrollView>

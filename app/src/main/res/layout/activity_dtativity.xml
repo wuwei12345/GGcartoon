@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="ggcartoon.yztc.com.ggcartoon.DTAtivity">
+    <com.baidu.mapapi.map.MapView
+        android:id="@+id/bmpView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9"
+        android:clickable="true"
+        >
+    </com.baidu.mapapi.map.MapView>
+    <TextView
+        android:id="@+id/tv_loaction"
+        android:gravity="center"
+        android:text="未获取到当前位置"
+        android:textSize="16sp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        />
+</LinearLayout>

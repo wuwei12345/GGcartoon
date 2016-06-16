@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:padding="5dp"
+    android:layout_height="match_parent">
+<ImageView
+    android:id="@+id/iv_shoucang_thumb"
+    android:src="@drawable/app_icon"
+    android:layout_width="80dp"
+    android:layout_height="80dp" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_margin="5dp"
+        android:orientation="vertical"
+        android:layout_toRightOf="@+id/iv_shoucang_thumb"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:id="@+id/linearLayout">
+        <TextView
+            android:id="@+id/tv_shoucang_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="title"
+            android:singleLine="true"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_updatetime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="title"
+            android:singleLine="true"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_lastCharpterTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="title"
+            android:singleLine="true"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/icon_cache_menubtn"
+        android:layout_alignBottom="@+id/linearLayout"
+        android:layout_alignParentEnd="true" />
+</RelativeLayout>

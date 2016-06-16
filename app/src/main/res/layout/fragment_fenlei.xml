@@ -1,0 +1,37 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="ggcartoon.yztc.com.fragment.FenleiFragment">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:padding="10dp"
+    android:layout_weight="1"
+    android:orientation="horizontal"
+    >
+    <EditText
+        android:id="@+id/FL_edit"
+        android:hint="漫画名|作者"
+        android:layout_width="0dp"
+        android:layout_weight="4"
+        android:layout_height="match_parent" />
+    <Button
+        android:id="@+id/FL_select"
+        android:layout_width="30dp"
+        android:layout_margin="5dp"
+        android:layout_height="30dp"
+        android:background="@drawable/search"
+        />
+</LinearLayout>
+<GridView
+    android:id="@+id/FL_list"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="7"
+    android:numColumns="4"
+    android:padding="10dp"
+    ></GridView>
+
+</LinearLayout>

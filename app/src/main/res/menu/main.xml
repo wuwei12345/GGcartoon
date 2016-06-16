@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:id="@+id/pinglun"
+        android:orderInCategory="2"
+        android:title="评论"/>
+    <item
+        android:id="@+id/jianjie"
+        android:orderInCategory="3"
+        android:title="漫画简介"/>
+
+</menu>

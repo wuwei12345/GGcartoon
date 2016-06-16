@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_margin="5dp"
+    android:layout_height="70dp">
+<TextView
+    android:id="@+id/tv_mhxq_name"
+    android:text="图库"
+    android:textColor="#00ff00"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/tv_mhxq_where"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_mhxq_name"
+        android:paddingTop="14dp"
+        android:text="13章" />
+
+    <TextView
+        android:id="@+id/tv_mhxq_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="1231231131" />
+</RelativeLayout>
