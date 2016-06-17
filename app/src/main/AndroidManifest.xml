@@ -62,9 +62,6 @@
         <activity
             android:name=".ManHuaXiangQingActivity"
             android:theme="@style/otherPageStyle" />
-        <activity
-            android:name=".ManHuaZhangJieActivity"
-            android:theme="@style/otherPageStyle" />
         <!-- 设置评论activity的主题为透明 -->
         <activity
             android:name=".PingLunListActivity"

@@ -1,5 +1,7 @@
 package ggcartoon.yztc.com.ggcartoon;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,6 +12,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +33,7 @@ import ggcartoon.yztc.com.Adapter.ManHuaXiangQingAdapter;
 import ggcartoon.yztc.com.Bean.ManHuaXiangQing;
 import ggcartoon.yztc.com.Bean.ShouCang;
 import ggcartoon.yztc.com.View.DividerItemDecoration;
+import ggcartoon.yztc.com.View.SelectPicPopupWindow;
 import ggcartoon.yztc.com.View.SwipBackActivityS;
 import ggcartoon.yztc.com.initerface.Initerface;
 import okhttp3.Call;
@@ -39,7 +43,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 //漫画详情页面
-public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initerface, View.OnClickListener {
+public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initerface {
 
     @Bind(R.id.mhxq_image)
     ImageView mhxqImage;
@@ -55,6 +59,8 @@ public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initer
     private ManHuaXiangQing.DataBean MH;
     //adapter
     private ManHuaXiangQingAdapter adapter;
+    //章节列表窗口
+    SelectPicPopupWindow window;
     //地址
     String path;
     String TitleName;
@@ -73,18 +79,14 @@ public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initer
                     //通过CollapsingToolbarLayout修改字体颜色
                     collapsingToolbarLayout.setBackgroundColor(Color.WHITE);
                     collapsingToolbarLayout.setExpandedTitleColor(Color.WHITE);//设置还没收缩时状态下字体颜色
-                    collapsingToolbarLayout.setCollapsedTitleTextColor(Color.GREEN);//设置收缩后Toolbar上字体的颜色
+                    collapsingToolbarLayout.setCollapsedTitleTextColor(Color.WHITE);//设置收缩后Toolbar上字体的颜色
                     //漫画图片
                     Picasso.with(ManHuaXiangQingActivity.this).load(MH.getThumb()).into(mhxqImage);
                     adapter.setOnItemClickLitener(new ManHuaXiangQingAdapter.OnItemClickLitener() {
                         @Override
                         public void onItemClick(View view, int position) {
-                            //点击携带相应数据跳转到漫画章节页面
-                            Intent intent = new Intent(ManHuaXiangQingActivity.this, ManHuaZhangJieActivity.class);
-                            intent.putExtra("id", MH.getComicSrc().get(position).getId());
-                            intent.putExtra("titlebar", TitleName);
-                            intent.putExtra("comIcid", Id);
-                            startActivity(intent);
+                            window=new SelectPicPopupWindow(ManHuaXiangQingActivity.this,MH.getComicSrc().get(position).getId(),TitleName,Id);
+                            window.showAtLocation((ManHuaXiangQingActivity.this.findViewById(R.id.mains)), Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
                         }
 
                         @Override
@@ -160,7 +162,17 @@ public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initer
                 }
                 break;
             case R.id.jianjie:
-                Toast.makeText(ManHuaXiangQingActivity.this, "漫画简介被单击", Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                dialog.setTitle(MH.getTitle());
+                dialog.setMessage(MH.getIntro());
+                dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //关闭dialog
+                        dialog.dismiss();
+                    }
+                });
+                dialog.create().show();
                 break;
             default:
 
@@ -185,12 +197,27 @@ public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initer
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_layout);
         fabDetail = (FloatingActionButton) findViewById(R.id.fab_detail);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+//        mhxqImage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent1=new Intent(ManHuaXiangQingActivity.this,ToolActivity.class);
+//                startActivity(intent1);
+//            }
+//        });
     }
 
     @Override
     public void initdata() {
         setSupportActionBar(toolbar);
+        //回执返回图标
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //单击返回
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         //修改背景颜色
         collapsingToolbarLayout.setBackgroundColor(Color.WHITE);
         //设置分割线
@@ -274,16 +301,4 @@ public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initer
         this.finish();
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-//            case R.id.iv_mhxq_image:
-//                Intent intent2=new Intent(ManHuaXiangQingActivity.this,ToolActivity.class);
-//                startActivity(intent2);
-//                break;
-            default:
-
-                break;
-        }
-    }
 }

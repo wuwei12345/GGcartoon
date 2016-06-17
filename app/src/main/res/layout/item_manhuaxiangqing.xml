@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_margin="5dp"
-    android:layout_height="70dp">
+    android:layout_height="60dp">
 <TextView
     android:id="@+id/tv_mhxq_name"
     android:text="图库"
@@ -21,6 +21,8 @@
         android:id="@+id/tv_mhxq_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="1231231131"
+        android:layout_alignBottom="@+id/tv_mhxq_where"
         android:layout_alignParentRight="true"
-        android:text="1231231131" />
+        android:layout_alignParentEnd="true" />
 </RelativeLayout>

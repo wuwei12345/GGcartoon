@@ -16,11 +16,13 @@ import java.util.List;
 
 import ggcartoon.yztc.com.Adapter.ToolAdapter;
 import ggcartoon.yztc.com.View.DividerItemDecoration;
+import ggcartoon.yztc.com.View.SelectPicPopupWindow;
 import ggcartoon.yztc.com.View.SwipBackActivityS;
 
 public class ToolActivity extends SwipBackActivityS {
     ToolAdapter adapter;
     List<String> list;
+    SelectPicPopupWindow window;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +55,8 @@ public class ToolActivity extends SwipBackActivityS {
             @Override
             public void onItemClick(View view, int position) {
                 Toast.makeText(ToolActivity.this,"点击了第"+position,Toast.LENGTH_SHORT).show();
+//                window=new SelectPicPopupWindow(ToolActivity.this);
+//                window.showAtLocation((ToolActivity.this.findViewById(R.id.main)),Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
             }
 
             @Override
@@ -85,7 +89,15 @@ public class ToolActivity extends SwipBackActivityS {
         return false;
     }
 
-
+private View.OnClickListener ItemClick=new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+            switch(v.getId()){
+                default:
+                    break;
+            }         
+    }
+};
 
 
     //    class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.MyViewHolder> {

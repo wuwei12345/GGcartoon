@@ -1,9 +1,9 @@
 package ggcartoon.yztc.com.Adapter;
 
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.List;
@@ -14,43 +14,54 @@ import ggcartoon.yztc.com.ggcartoon.R;
 /**
  * Created by Administrator on 2016/5/13.
  */
-public class ManHuaZhangJieAdapter extends BaseAdapter {
+public class ManHuaZhangJieAdapter extends RecyclerView.Adapter<ManHuaZhangJieAdapter.myViewHolder>{
     private List<ManHuaZhangJieBean.DataBean> list;
-    public void setDatas(List<ManHuaZhangJieBean.DataBean> list) {
+
+    public ManHuaZhangJieAdapter(List<ManHuaZhangJieBean.DataBean> list) {
         this.list = list;
-        notifyDataSetChanged();
-    }
-    @Override
-    public int getCount() {
-        return list!=null?list.size():0;
     }
 
     @Override
-    public Object getItem(int position) {
-        return list.get(position);
+    public myViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        myViewHolder viewHolder=new myViewHolder(LayoutInflater.from(parent.getContext()).
+                inflate(R.layout.mhzj_lv_item,parent,false));
+        return viewHolder;
+    }
+    //单击事件
+    public interface OnItemClickLitener {
+        void onItemClick(View view, int position);
+
+        void onItemLongClick(View view, int position);
     }
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
+    private OnItemClickLitener mOnItemClickLitener;
 
+    public void setOnItemClickLitener(OnItemClickLitener mOnItemClickLitener) {
+        this.mOnItemClickLitener = mOnItemClickLitener;
+    }
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder VH;
-        if (convertView==null){
-            VH=new ViewHolder();
-            convertView= LayoutInflater.from(parent.getContext()).inflate(R.layout.mhzj_lv_item,null);
-            VH.titlebar= (TextView) convertView.findViewById(R.id.title);
-            convertView.setTag(VH);
-        }else{
-            VH= (ViewHolder) convertView.getTag();
+    public void onBindViewHolder(final myViewHolder holder, int position) {
+        holder.tv.setText(list.get(position).getTitle());
+        if (mOnItemClickLitener != null) {
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnItemClickLitener.onItemClick(holder.itemView,holder.getLayoutPosition());
+                }
+            });
         }
-            ManHuaZhangJieBean.DataBean ZJ = list.get(position);
-            VH.titlebar.setText(ZJ.getTitle());
-        return convertView;
     }
-    class ViewHolder{
-    TextView titlebar;
+
+    @Override
+    public int getItemCount() {
+        return list.size();
     }
+
+    class myViewHolder extends RecyclerView.ViewHolder{
+        TextView tv;
+       public myViewHolder(View itemView) {
+           super(itemView);
+           tv= (TextView) itemView.findViewById(R.id.title);
+       }
+   }
 }
