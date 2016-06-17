@@ -10,6 +10,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -39,7 +41,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class ManHuaActivity extends Activity implements Initerface, View.OnClickListener {
+public class ManHuaActivity extends Activity implements Initerface, View.OnClickListener,View.OnTouchListener, GestureDetector.OnGestureListener {
 
     @Bind(R.id.vp)
     ViewPager vp;
@@ -66,6 +68,8 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
     String id;
     //接口地址
     String path;
+    //判断最后一页标志位
+    GestureDetector gestureDetector;
     Handler handler=new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -97,6 +101,9 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
                     mydaapter.notifyDataSetChanged();
                     yeshu.setText("1" + "/" + list.size());
                  break;
+                case 1:
+                    Toast.makeText(ManHuaActivity.this, "网络获取失败", Toast.LENGTH_SHORT).show();
+                    break;
                 default:
 
                  break;
@@ -134,7 +141,6 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
         receiver = new BatteryReceiver();
         //注册广播接收器
         registerReceiver(receiver, filter);
-
     }
 
     @Override
@@ -167,6 +173,9 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
             public void onPageSelected(int position) {
                 if (position==list.size()-1){
                     Toast.makeText(ManHuaActivity.this, "已到最后一张", Toast.LENGTH_SHORT).show();
+                    gestureDetector=new GestureDetector(ManHuaActivity.this);
+                    vp.setOnTouchListener(ManHuaActivity.this);
+                    vp.setLongClickable(true);
                 }
                 yeshu.setText(position + 1 + "/" + list.size());
             }
@@ -178,31 +187,7 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
         });
     }
 
-//    private void downLoad() {
-//        mhttpUtils.send(HttpRequest.HttpMethod.GET, path, new RequestCallBack<String>() {
-//            @Override
-//            public void onSuccess(ResponseInfo<String> responseInfo) {
-//                try {
-//                    //json解析
-//                    String json = responseInfo.result;
-//                    JSONObject obj = new JSONObject(json);
-//                    JSONObject obj2 = obj.getJSONObject("data");
-//                    JSONArray array=obj2.getJSONArray("addrs");
-//                   for (int i=0;i<=array.length()-1;i++){
-//                            MH.add(array.getString(i));
-//                   }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//                handler.sendEmptyMessage(0);
-//            }
-//
-//            @Override
-//            public void onFailure(HttpException e, String s) {
-//                Toast.makeText(ManHuaActivity.this, "获取内容失败，请检查网络", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
+
     //加载网络数据
     void run(String url) {
         OkHttpClient client = new OkHttpClient();
@@ -211,7 +196,7 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(ManHuaActivity.this, "网络获取失败", Toast.LENGTH_SHORT).show();
+                handler.sendEmptyMessage(1);
             }
 
             @Override
@@ -237,6 +222,46 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
     public void onClick(View v) {
 
     }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        //进行加载下一话操作
+        System.out.println("手势向左滑动");
+
+        return gestureDetector.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean onDown(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        System.out.println("onfling"+e1.toString());
+        return false;
+    }
+
 
     private class BatteryReceiver extends BroadcastReceiver {
 

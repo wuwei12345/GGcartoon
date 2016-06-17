@@ -3,11 +3,14 @@ package ggcartoon.yztc.com.ggcartoon;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -19,14 +22,20 @@ import ggcartoon.yztc.com.View.DividerItemDecoration;
 import ggcartoon.yztc.com.View.SelectPicPopupWindow;
 import ggcartoon.yztc.com.View.SwipBackActivityS;
 
-public class ToolActivity extends SwipBackActivityS {
+public class ToolActivity extends SwipBackActivityS implements View.OnTouchListener,GestureDetector.OnGestureListener{
     ToolAdapter adapter;
     List<String> list;
     SelectPicPopupWindow window;
+    GestureDetector gestureDetector;
+    CoordinatorLayout COOR;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tool);
+        gestureDetector=new GestureDetector(this);
+        COOR= (CoordinatorLayout) findViewById(R.id.main);
+        COOR.setOnTouchListener(this);
+        COOR.setLongClickable(true);
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -99,51 +108,48 @@ private View.OnClickListener ItemClick=new View.OnClickListener() {
     }
 };
 
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        return gestureDetector.onTouchEvent(event);
+    }
 
-    //    class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.MyViewHolder> {
-//        List<Integer> heights;
-//        List<String> list;
-//        public HomeAdapter(List<String> list) {
-//            this.list = list;
-//            getRandomHeight(list);
-//        }
-//
-//        @Override
-//        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//            MyViewHolder holder = new MyViewHolder(LayoutInflater.from(
-//                    ToolActivity.this).inflate(R.layout.item_gengxin, parent,
-//                    false));
-//            return holder;
-//        }
-//        private void getRandomHeight(List<String> lists){//得到随机item的高度
-//            heights = new ArrayList<>();
-//            for (int i = 0; i < lists.size(); i++) {
-//                heights.add((int)(200+Math.random()*400));
-//            }
-//        }
-//        @Override
-//        public void onBindViewHolder(MyViewHolder holder, int position) {
-//            ViewGroup.LayoutParams params =  holder.itemView.getLayoutParams();//得到item的LayoutParams布局参数
-//            params.height = heights.get(position);//把随机的高度赋予item布局
-//            holder.itemView.setLayoutParams(params);//把params设置给item布局
-//            holder.tv.setText(list.get(position));
-//        }
-//        @Override
-//        public int getItemCount() {
-//            return list.size();
-//        }
-//
-//        //define interface
-//
-//        class MyViewHolder extends RecyclerView.ViewHolder {
-//
-//            TextView tv;
-//            public MyViewHolder(View view) {
-//                super(view);
-//                tv = (TextView) view.findViewById(R.id.gengxin_titile);
-//            }
-//        }
+    @Override
+    public boolean onDown(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 
 
-//    }
+        if (e1.getX()-e2.getX()>50&& Math.abs(velocityX)>0){
+            Toast.makeText(this, "向左手势", Toast.LENGTH_SHORT).show();
+        }else if (e2.getX()-e1.getX()>50&& Math.abs(velocityX)>0){
+            Toast.makeText(this, "向右手势", Toast.LENGTH_SHORT).show();
+        }
+        return false;
+    }
+
+
+
 }
