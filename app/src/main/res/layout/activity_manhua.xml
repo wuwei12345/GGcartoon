@@ -34,7 +34,15 @@
             android:layout_toRightOf="@+id/tm"
             android:text="12:12"
             android:textColor="#ffffff" />
-
+        <TextView
+            android:id="@+id/MH_Title"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:text="标题"
+            android:textColor="#fff"
+            android:maxLength="10"
+            android:gravity="center_horizontal"
+            android:layout_centerHorizontal="true" />
         <TextView
             android:id="@+id/yeshu"
             android:layout_width="wrap_content"

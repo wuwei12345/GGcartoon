@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
@@ -22,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 
 import ggcartoon.yztc.com.Adapter.ManHuaZhangJieAdapter;
@@ -56,7 +58,10 @@ public class SelectPicPopupWindow extends PopupWindow {
                         @Override
                         public void onItemClick(View view, int position) {
                             Intent intent=new Intent(context,ManHuaActivity.class);
-                            intent.putExtra("bid",MHZJ.get(position).getId()+"");
+                            intent.putExtra("bid",MHZJ.get(position).getId());
+                            Bundle bundle=new Bundle();
+                            bundle.putSerializable("MHZJ", (Serializable) MHZJ);
+                            intent.putExtras(bundle);
                             context.startActivity(intent);
                         }
 

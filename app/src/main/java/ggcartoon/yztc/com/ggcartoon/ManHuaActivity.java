@@ -1,6 +1,7 @@
 package ggcartoon.yztc.com.ggcartoon;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,8 +11,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -34,6 +33,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import ggcartoon.yztc.com.Bean.ManHuaZhangJieBean;
 import ggcartoon.yztc.com.initerface.Initerface;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -41,7 +41,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class ManHuaActivity extends Activity implements Initerface, View.OnClickListener,View.OnTouchListener, GestureDetector.OnGestureListener {
+public class ManHuaActivity extends Activity implements Initerface {
 
     @Bind(R.id.vp)
     ViewPager vp;
@@ -55,6 +55,7 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
     TextView pw;
     @Bind(R.id.pow)
     TextView pow;
+    TextView MH_title;
     //用来存放图片的列表
     List<PhotoView> list;
     MyAdapter mydaapter;
@@ -63,53 +64,50 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
     //电量
     private BatteryReceiver receiver;
     //bean
-    private List<String> MH=new ArrayList<>();
+    private List<String> MH;
     //上个页面获取的ID
-    String id;
-    //接口地址
-    String path;
-    //判断最后一页标志位
-    GestureDetector gestureDetector;
-    Handler handler=new Handler(){
+    int id;
+    AlertDialog.Builder dialog;
+    AlertDialog build;
+    PhotoView iv;
+    private List<ManHuaZhangJieBean.DataBean> MHZJ;
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch(msg.what){
+            switch (msg.what) {
                 case 0:
-                list=new ArrayList<>();
-                    for (int i=0;i<MH.size();i++){
-                        PhotoView iv=new PhotoView(ManHuaActivity.this);
+                    list = new ArrayList<>();
+                    for (int i = 0; i < MH.size(); i++) {
+                        iv = new PhotoView(ManHuaActivity.this);
                         //启动放大缩小
                         iv.enable();
                         //充满全屏
                         iv.setScaleType(ImageView.ScaleType.FIT_XY);
-                        //图片单击事件
-                        iv.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-
-                            }
-                        });
                         try {
                             Picasso.with(ManHuaActivity.this).load(MH.get(i)).into(iv);
                             Thread.sleep(100);
                             list.add(iv);
+                            yeshu.setText("1" + "/" + list.size());
+                            mydaapter.notifyDataSetChanged();
+                            //关闭dialog
+                            build.dismiss();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
-                    mydaapter.notifyDataSetChanged();
-                    yeshu.setText("1" + "/" + list.size());
-                 break;
+                    break;
                 case 1:
                     Toast.makeText(ManHuaActivity.this, "网络获取失败", Toast.LENGTH_SHORT).show();
+                    //关闭dialog
+                    build.dismiss();
                     break;
                 default:
 
-                 break;
+                    break;
             }
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,6 +117,7 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
         initdata();
         initviewoper();
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -127,6 +126,7 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
             unregisterReceiver(receiver);
         }
     }
+
     //初始化控件
     @Override
     public void initview() {
@@ -136,53 +136,121 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
         yeshu = (TextView) findViewById(R.id.yeshu);
         pw = (TextView) findViewById(R.id.pw);
         pow = (TextView) findViewById(R.id.pow);
+        MH_title = (TextView) findViewById(R.id.MH_Title);
         //初始化电量监听器
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         receiver = new BatteryReceiver();
         //注册广播接收器
         registerReceiver(receiver, filter);
+        //加载提示
+        dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("提示");
+        dialog.setMessage("正在加载...");
+        build = dialog.show();
     }
 
     @Override
     public void initdata() {
-        mhttpUtils = new HttpUtils();
         //获取传过来的id
         Intent intent = getIntent();
-        id = intent.getStringExtra("bid");
-        path = "http://csapi.dm300.com:21889/android/comic/charpterinfo?charpterid=" + id;
+        //获得选中漫画的ID
+        id = intent.getIntExtra("bid", -1);
+        System.out.println("-->该漫画ID：" + id);
+        Bundle bundle = intent.getExtras();
+        MHZJ = (List<ManHuaZhangJieBean.DataBean>) bundle.getSerializable("MHZJ");
     }
 
     @Override
     public void initviewoper() {
+        build.show();
+        //接口地址
+        String path = "http://csapi.dm300.com:21889/android/comic/charpterinfo?charpterid=" + id;
         //加载系统时间
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date(System.currentTimeMillis());
         time.setText(format.format(date));
+        //设置漫画标题
+        for (int i = 0; i < MHZJ.size(); i++) {
+            if (id == MHZJ.get(i).getId()) {
+                MH_title.setText(MHZJ.get(i).getTitle());
+            }
+        }
         //通过接口获取漫画内容
 //        downLoad();
         run(path);
-        mydaapter=new MyAdapter();
+        mydaapter = new MyAdapter();
         vp.setAdapter(mydaapter);
         vp.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            int pos = 0;
+            int maxpos = 0;
+            int currentPageScrollStatus;
+            boolean flag=true;
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+                System.out.println("------>pos:" + pos + "  ------->maxpos:" + maxpos);
+                if (pos == 0) {
+                    //如果offsetPixels是0页面也被滑动了，代表在第一页还要往左划
+                    if (positionOffsetPixels == 0 && currentPageScrollStatus == 1) {
+                        for (int i = 0; i < MHZJ.size(); i++) {
+                            //先判断到当前id所对应的章节ID的位置
+                            if (MHZJ.get(i).getId() == id) {
+                                System.out.println("------>i:"+i+" Mhzj:"+MHZJ.size());
+                                if (!(i>=MHZJ.size()-1)) {
+                                    if (i + 1 <= MHZJ.size()) {
+                                        if (flag) {
+                                            //MHZJ.get(i - 1).getId() > MHZJ.get(i).getId()
+                                            id = MHZJ.get(i + 1).getId();
+                                            System.out.println("------>当前ID:" + MHZJ.get(i).getId() + "------->上一章id:" + id);
+                                            initviewoper();
+                                            flag=false;
+                                        }
+                                    }
+                                } else {
+                                    Toast.makeText(ManHuaActivity.this, "前面没有了", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+                    }
+                } else if (pos == maxpos) {
+                    if (positionOffsetPixels == 0 && currentPageScrollStatus == 1) {
+                        for (int i = 0; i < MHZJ.size(); i++) {
+                            //先判断到当前id所对应的章节ID的位置
+                            if (MHZJ.get(i).getId() == id) {
+                                if (i != 0) {
+                                    if (!(i - 1 < 0)) {
+                                        //MHZJ.get(i - 1).getId() > MHZJ.get(i).getId()
+                                        System.out.println("------>当前ID:" + MHZJ.get(i).getId() + "------->下一章id:" + MHZJ.get(i - 1).getId());
+                                        id = MHZJ.get(i - 1).getId();
+                                        initviewoper();
+                                    }
+                                } else {
+                                    Toast.makeText(ManHuaActivity.this, "您已经看完了", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             @Override
             public void onPageSelected(int position) {
-                if (position==list.size()-1){
-                    Toast.makeText(ManHuaActivity.this, "已到最后一张", Toast.LENGTH_SHORT).show();
-                    gestureDetector=new GestureDetector(ManHuaActivity.this);
-                    vp.setOnTouchListener(ManHuaActivity.this);
-                    vp.setLongClickable(true);
+                setCurrentPos(position);
+                if (position == list.size() - 1) {
+                    //设置最后一页的position值
+                    maxpos = position;
                 }
                 yeshu.setText(position + 1 + "/" + list.size());
             }
 
             @Override
             public void onPageScrollStateChanged(int state) {
+                //记录page滑动状态，如果滑动了state就是1
+                currentPageScrollStatus = state;
+            }
 
+            public void setCurrentPos(int position) {
+                //设置当前页的position值
+                pos = position;
             }
         });
     }
@@ -203,11 +271,12 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
             public void onResponse(Call call, Response response) throws IOException {
                 String json = response.body().string();
                 try {
+                    MH = new ArrayList<>();
                     //json解析
                     JSONObject obj = new JSONObject(json);
                     JSONObject obj2 = obj.getJSONObject("data");
-                    JSONArray array=obj2.getJSONArray("addrs");
-                    for (int i=0;i<=array.length()-1;i++){
+                    JSONArray array = obj2.getJSONArray("addrs");
+                    for (int i = 0; i <= array.length() - 1; i++) {
                         MH.add(array.getString(i));
                     }
                 } catch (JSONException e) {
@@ -217,49 +286,6 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
             }
         });
 
-    }
-    @Override
-    public void onClick(View v) {
-
-    }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        //进行加载下一话操作
-        System.out.println("手势向左滑动");
-
-        return gestureDetector.onTouchEvent(event);
-    }
-
-    @Override
-    public boolean onDown(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        System.out.println("onfling"+e1.toString());
-        return false;
     }
 
 
@@ -274,16 +300,35 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
             pow.setText(percent + "%");
         }
     }
-    class MyAdapter extends PagerAdapter{
+
+    class MyAdapter extends PagerAdapter {
+        /*覆盖getItemPosition()方法，当调用notifyDataSetChanged时，
+        让getItemPosition方法人为的返回POSITION_NONE，从而达到强迫viewpager重绘所有item的目的。*/
+        private int mChildCount = 0;
+
+        @Override
+        public void notifyDataSetChanged() {
+            mChildCount = getCount();
+            super.notifyDataSetChanged();
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            if (mChildCount > 0) {
+                mChildCount--;
+                return POSITION_NONE;
+            }
+            return super.getItemPosition(object);
+        }
 
         @Override
         public int getCount() {
-            return list!=null?list.size():0;
+            return list != null ? list.size() : 0;
         }
 
         @Override
         public boolean isViewFromObject(View view, Object object) {
-            return view==object;
+            return view == object;
         }
 
         @Override
@@ -297,5 +342,6 @@ public class ManHuaActivity extends Activity implements Initerface, View.OnClick
             container.addView(list.get(position));
             return list.get(position);
         }
+
     }
 }

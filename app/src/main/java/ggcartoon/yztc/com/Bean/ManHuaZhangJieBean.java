@@ -1,8 +1,9 @@
 package ggcartoon.yztc.com.Bean;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ManHuaZhangJieBean {
+public class ManHuaZhangJieBean implements Serializable{
 
 
     /**
@@ -25,7 +26,7 @@ public class ManHuaZhangJieBean {
         this.data = data;
     }
 
-    public static class DataBean {
+    public static class DataBean implements Serializable{
         private String title;
         private int sid;
         private int id;
