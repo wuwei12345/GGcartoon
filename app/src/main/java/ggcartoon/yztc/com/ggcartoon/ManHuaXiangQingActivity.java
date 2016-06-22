@@ -197,13 +197,13 @@ public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initer
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_layout);
         fabDetail = (FloatingActionButton) findViewById(R.id.fab_detail);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mhxqImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent1=new Intent(ManHuaXiangQingActivity.this,ToolActivity.class);
-                startActivity(intent1);
-            }
-        });
+//        mhxqImage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent1=new Intent(ManHuaXiangQingActivity.this,ToolActivity.class);
+//                startActivity(intent1);
+//            }
+//        });
     }
 
     @Override

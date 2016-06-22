@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/GGcartoon.iml" filepath="$PROJECT_DIR$/GGcartoon.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ImageViewutils/ImageViewutils.iml" filepath="$PROJECT_DIR$/ImageViewutils/ImageViewutils.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
       <module fileurl="file://$PROJECT_DIR$/roundedimageview/roundedimageview.iml" filepath="$PROJECT_DIR$/roundedimageview/roundedimageview.iml" />

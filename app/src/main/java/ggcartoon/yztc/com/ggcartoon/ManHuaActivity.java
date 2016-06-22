@@ -131,6 +131,7 @@ public class ManHuaActivity extends Activity implements Initerface {
     @Override
     public void initview() {
         vp = (ViewPager) findViewById(R.id.vp);
+        vp.setOffscreenPageLimit(0);
         tm = (TextView) findViewById(R.id.tm);
         time = (TextView) findViewById(R.id.time);
         yeshu = (TextView) findViewById(R.id.yeshu);
