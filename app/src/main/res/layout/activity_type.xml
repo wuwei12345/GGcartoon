@@ -1,58 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
-
-    <RelativeLayout
+     >
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/Type_Toolbar"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="#000000" >
+        android:layout_height="60dp"
+        ></android.support.v7.widget.Toolbar>
 
-        <ImageView
-            android:id="@+id/iv_mhlb"
+
+        <android.support.design.widget.FloatingActionButton
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/but_up"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:src="@drawable/btn_fanhui" />
-
-        <TextView
-            android:id="@+id/tv_mhlb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="分类"
-            android:textColor="#ffffff" />
-
-        <LinearLayout
-            android:id="@+id/ll_mhlb"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:src="@drawable/jiantou_up"
+            app:backgroundTint="#fff"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="40dp"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="35dp" />
 
-            <TextView
-                android:id="@+id/btn_mhlb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="热门"
-                android:textColor="#ffffff" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/drop_down_menu" />
-        </LinearLayout>
-    </RelativeLayout>
-    <ListView
+        <com.handmark.pulltorefresh.library.PullToRefreshListView
+            android:layout_below="@+id/Type_Toolbar"
         android:id="@+id/lv_mhlb"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="10"
+        android:layout_height="match_parent"
         android:dividerHeight="2dp"
-         >
-    </ListView>
-
-</LinearLayout>
+        />
+</RelativeLayout>

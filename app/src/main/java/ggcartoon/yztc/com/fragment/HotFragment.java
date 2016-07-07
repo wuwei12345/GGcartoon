@@ -209,36 +209,7 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
                 mhandler.sendEmptyMessage(1);
             }
         });
-//        http.send(HttpRequest.HttpMethod.GET, url, new RequestCallBack<String>() {
-//            @Override
-//            public void onLoading(long total, long current, boolean isUploading) {
-//                super.onLoading(total, current, isUploading);
-//                if (!isUploading) {
-//                    mProgressBar.setVisibility(View.VISIBLE);
-//                }
-//            }
-//
-//            @Override
-//            public void onSuccess(ResponseInfo<String> responseInfo) {
-//                String json = responseInfo.result;
-//                try {
-//                    JSONObject jsonobject = new JSONObject(json);
-//                    JSONArray jsonarray = jsonobject.getJSONArray("data");
-//                    Gridelist = JSON.parseArray(jsonarray.toString(), GridBean.DataBean.class);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//                mProgressBar.setVisibility(View.INVISIBLE);
-//                mhandler.sendEmptyMessage(1);
-//                //加载后返回到最顶部
-//                hotScrollView.getRefreshableView().fullScroll(0);
-//            }
-//
-//            @Override
-//            public void onFailure(HttpException e, String s) {
-//
-//            }
-//        });
+
     }
 
 
@@ -257,52 +228,7 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
 
     //广告获取内容
     private void initHeadvpData() {
-//        http.send(HttpRequest.HttpMethod.GET, vppath, new RequestCallBack<String>() {
-//            @Override
-//            public void onSuccess(ResponseInfo<String> request) {
-//                String json = request.result;
-//                String obj= com.alibaba.fastjson.JSONObject.parseObject(json).getString("data");
-//                list= com.alibaba.fastjson.JSONArray.parseArray(obj.toString(),Head.DataBean.class);
-//                try {
 
-//                    JSONObject jsonobject = new JSONObject(json);
-//                    JSONArray jsonarray = jsonobject.getJSONArray("data");
-//                    for (int i = 0; i < jsonarray.length(); i++) {
-//                        JSONObject obj = jsonarray.getJSONObject(i);
-//                        String title = obj.getString("title");
-//                        String imagethumb = obj.getString("thumb");
-//                        String recom_return = obj.getString("recom_return");
-//                        String recom_index = obj.getString("recom_index");
-//                        Head head = new Head(title, imagethumb, recom_index, recom_return);
-//                        list.add(head);
-//                        //加载网络图片
-//                        imageview = new ImageView(getActivity());
-//                        bitmapUtils.display(imageview, imagethumb);
-//                        titleres.add(title);
-//                        imageres.add(imageview);
-//                    }
-//                    for (int i=0;i<list.size();i++) {
-//                        imageview = new ImageView(getActivity());
-//                        bitmapUtils.display(imageview, list.get(i).getThumb());
-//                        titleres.add(list.get(i).getTitle());
-//                        imageres.add(imageview);
-//                    }
-//                    //adapter填充
-//                    tvTitle.setText(titleres.get(0));
-//                    tvTitle.setBackgroundColor(Color.argb(100, 0, 0, 0));
-//                    headvpadapter = new HeadvpAdapter();
-//                    mHeadvp.setAdapter(headvpadapter);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onFailure(HttpException e, String s) {
-//
-//            }
-//        });
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(vppath).build();
         Call call = client.newCall(request);

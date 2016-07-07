@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,21 +18,23 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import ggcartoon.yztc.com.Adapter.PinLunAdapter;
 import ggcartoon.yztc.com.Bean.PinLunBean;
+import ggcartoon.yztc.com.View.SwipBackActivityS;
 import ggcartoon.yztc.com.initerface.Initerface;
-import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static ggcartoon.yztc.com.ggcartoon.R.id.PL_fanhui;
 
-public class PingLunListActivity extends SwipeBackActivity implements Initerface, View.OnClickListener {
+public class PingLunListActivity extends SwipBackActivityS implements Initerface, View.OnClickListener {
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
     //返回按钮，标题
-    private ImageView PL_back;
     private TextView PL_title;
     //List列表
     private ListView list;
@@ -42,37 +44,50 @@ public class PingLunListActivity extends SwipeBackActivity implements Initerface
     private PinLunBean.DataBean PL_Date;
     //评论adapter
     private PinLunAdapter plAdapter;
+    //Toolbar
     String title, comicId;
-    Handler handler=new Handler(){
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch(msg.what){
+            switch (msg.what) {
                 case 1:
                     //将bean的内容传入adapter
                     plAdapter.setDate(PL_Date.getComment_list());
-                 break;
+                    break;
+                case 2:
+                    Toast.makeText(PingLunListActivity.this, "网络获取失败", Toast.LENGTH_SHORT).show();
+                    break;
                 default:
 
-                 break;
+                    break;
             }
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pinglunlist);
+        ButterKnife.bind(this);
         initview();
         initdata();
         initviewoper();
     }
+
     //初始化控件
     @Override
     public void initview() {
+        toolbar.setTitle("评论");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         httpUtils = new HttpUtils();
-        PL_back = (ImageView) findViewById(PL_fanhui);
-        PL_title = (TextView) findViewById(R.id.PL_title);
         list = (ListView) findViewById(R.id.PL_list);
-        PL_back.setOnClickListener(this);
     }
 
     @Override
@@ -127,7 +142,7 @@ public class PingLunListActivity extends SwipeBackActivity implements Initerface
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(PingLunListActivity.this, "网络获取失败", Toast.LENGTH_SHORT).show();
+                handler.sendEmptyMessage(2);
             }
 
             @Override
@@ -150,9 +165,6 @@ public class PingLunListActivity extends SwipeBackActivity implements Initerface
     public void onClick(View v) {
         switch (v.getId()) {
             //返回按钮
-            case R.id.PL_fanhui:
-                PingLunListActivity.this.finish();
-                break;
             default:
 
                 break;

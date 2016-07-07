@@ -4,10 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,8 +25,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import ggcartoon.yztc.com.Adapter.SelectAdapter;
 import ggcartoon.yztc.com.Bean.SelectBean;
+import ggcartoon.yztc.com.View.SwipBackActivityS;
 import ggcartoon.yztc.com.initerface.Initerface;
-import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -37,28 +37,26 @@ import static com.handmark.pulltorefresh.library.PullToRefreshBase.Mode.BOTH;
 import static com.handmark.pulltorefresh.library.PullToRefreshBase.Mode.PULL_FROM_END;
 import static com.handmark.pulltorefresh.library.PullToRefreshBase.Mode.PULL_FROM_START;
 
-public class SelectActivity extends SwipeBackActivity implements Initerface {
+public class SelectActivity extends SwipBackActivityS implements Initerface {
 
-    @Bind(R.id.iv_mhlb)
-    ImageView ivMhlb;
-    @Bind(R.id.tv_mhlb)
-    TextView tvMhlb;
-    @Bind(R.id.ll_mhlb)
-    LinearLayout llMhlb;
     @Bind(R.id.lv_mhlb)
     PullToRefreshListView lvMhlb;
     @Bind(R.id.tv_NO)
     TextView tvNO;
+    @Bind(R.id.select_toolbar)
+    Toolbar selectToolbar;
+    @Bind(R.id.but_ups)
+    FloatingActionButton butUps;
     private HttpUtils httpUtils;
     private String path;
     private List<SelectBean.DataBean> list;
     private SelectAdapter adapter;
     String value;
-    int page=1;
-    Handler handler=new Handler(){
+    int page = 1;
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch(msg.what){
+            switch (msg.what) {
                 case 1:
                     //隐藏搜索为空的textview
                     tvNO.setVisibility(View.GONE);
@@ -67,16 +65,33 @@ public class SelectActivity extends SwipeBackActivity implements Initerface {
                     lvMhlb.setAdapter(adapter);
                     //显示列表
                     lvMhlb.setVisibility(View.VISIBLE);
-                 break;
+                    lvMhlb.onRefreshComplete();
+                    break;
                 case 2:
-                    Toast.makeText(SelectActivity.this,"网络网络获取数据失败",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SelectActivity.this, "网络网络获取数据失败", Toast.LENGTH_SHORT).show();
+                    break;
+                case 3:
+                    Toast.makeText(SelectActivity.this, "没有更多", Toast.LENGTH_SHORT).show();
+                    lvMhlb.onRefreshComplete();
+                    break;
+                case 4:
+                    //隐藏搜索为空的textview
+                    tvNO.setVisibility(View.GONE);
+                    //设置adapter
+                    adapter.setData(list);
+                    //刷新adapter
+                    adapter.notifyDataSetChanged();
+                    //显示列表
+                    lvMhlb.setVisibility(View.VISIBLE);
+                    lvMhlb.onRefreshComplete();
                     break;
                 default:
 
-                 break;
+                    break;
             }
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,18 +101,27 @@ public class SelectActivity extends SwipeBackActivity implements Initerface {
         initdata();
         initviewoper();
     }
+
     //初始化控件
     @Override
     public void initview() {
+        selectToolbar = (Toolbar) findViewById(R.id.select_toolbar);
+        selectToolbar.setTitle("搜索");
+        setSupportActionBar(selectToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        selectToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         httpUtils = new HttpUtils();
         adapter = new SelectAdapter();
         tvNO = (TextView) findViewById(R.id.tv_NO);
-        ivMhlb = (ImageView) findViewById(R.id.iv_mhlb);
-        tvMhlb = (TextView) findViewById(R.id.tv_mhlb);
-        llMhlb = (LinearLayout) findViewById(R.id.ll_mhlb);
         lvMhlb = (PullToRefreshListView) findViewById(R.id.lv_mhlb);
 
     }
+
     private void initListView() {
         // TODO Auto-generated method stub
         lvMhlb.setMode(BOTH);
@@ -105,13 +129,15 @@ public class SelectActivity extends SwipeBackActivity implements Initerface {
         lvMhlb.setRefreshingLabel("正在加载...", PULL_FROM_START);
         lvMhlb.setReleaseLabel("放开刷新", PULL_FROM_START);
         lvMhlb.setPullLabel("上拉加载", PULL_FROM_END);
-        lvMhlb.setRefreshingLabel("正在加载ing...", PULL_FROM_END);
+        lvMhlb.setRefreshingLabel("正在加载...", PULL_FROM_END);
         lvMhlb.setReleaseLabel("放开刷新up...", PULL_FROM_END);
     }
+
     @Override
     public void initdata() {
         Intent intent = getIntent();
-        value= intent.getStringExtra("value");
+        value = intent.getStringExtra("value");
+        selectToolbar.setTitle(value);
 //        download();
         //加载数据
         run();
@@ -138,7 +164,7 @@ public class SelectActivity extends SwipeBackActivity implements Initerface {
 //    }
     //加载网络数据
     void run() {
-        path="http://csapi.dm300.com:21889/android/search/query?pagesize=30&page="+page+++"&keyword="+value;
+        path = "http://csapi.dm300.com:21889/android/search/query?pagesize=30&page=" + page++ + "&keyword=" + value;
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(path).build();
         Call call = client.newCall(request);
@@ -153,15 +179,22 @@ public class SelectActivity extends SwipeBackActivity implements Initerface {
                 String json = response.body().string();
                 if (JSONObject.parseObject(json).getString("data") != null) {
                     String obj = JSONObject.parseObject(json).getString("data");
-                    list = JSONArray.parseArray(obj.toString(), SelectBean.DataBean.class);
-//                    if (list!=null) {
-                        handler.sendEmptyMessage(1);
-//                    }
+                    if (list == null) {
+                        list = JSONArray.parseArray(obj.toString(), SelectBean.DataBean.class);
+                        handler.sendEmptyMessageDelayed(1, 2000);
+                    } else {
+                        list.addAll(JSONArray.parseArray(obj.toString(), SelectBean.DataBean.class));
+                        handler.sendEmptyMessageDelayed(4, 2000);
+                    }
+
+                } else {
+                    handler.sendEmptyMessageDelayed(3, 2000);
                 }
             }
         });
 
     }
+
     @Override
     public void initviewoper() {
         initListView();
@@ -169,20 +202,21 @@ public class SelectActivity extends SwipeBackActivity implements Initerface {
         lvMhlb.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent=new Intent(SelectActivity.this, ManHuaXiangQingActivity.class);
-                intent.putExtra("comicId", list.get(position).getComicId()+"");
-                intent.putExtra("title", list.get(position).getTitle()+"");
+                Intent intent = new Intent(SelectActivity.this, ManHuaXiangQingActivity.class);
+                intent.putExtra("comicId", list.get(position - 1).getComicId() + "");
+                intent.putExtra("title", list.get(position - 1).getTitle() + "");
                 startActivity(intent);
             }
         });
-        ivMhlb.setOnClickListener(new View.OnClickListener() {
+        lvMhlb.setOnRefreshListener(onRefreshListener);
+        butUps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SelectActivity.this.finish();
+                lvMhlb.getRefreshableView().setSelection(0);
             }
         });
-        lvMhlb.setOnRefreshListener(onRefreshListener);
     }
+
     private PullToRefreshBase.OnRefreshListener<ListView> onRefreshListener = new PullToRefreshBase.OnRefreshListener<ListView>() {
         @Override
         public void onRefresh(PullToRefreshBase<ListView> refreshView) {

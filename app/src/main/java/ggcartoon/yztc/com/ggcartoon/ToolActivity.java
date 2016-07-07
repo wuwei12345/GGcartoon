@@ -21,7 +21,7 @@ import ggcartoon.yztc.com.Adapter.ToolAdapter;
 import ggcartoon.yztc.com.View.DividerItemDecoration;
 import ggcartoon.yztc.com.View.SelectPicPopupWindow;
 import ggcartoon.yztc.com.View.SwipBackActivityS;
-
+//测试界面
 public class ToolActivity extends SwipBackActivityS implements View.OnTouchListener,GestureDetector.OnGestureListener{
     ToolAdapter adapter;
     List<String> list;

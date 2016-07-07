@@ -10,7 +10,7 @@ import me.imid.swipebacklayout.lib.app.SwipeBackActivityBase;
 import me.imid.swipebacklayout.lib.app.SwipeBackActivityHelper;
 
 /**
- * Created by Administrator on 2016/6/16.
+ * 带侧滑返回的AppCompatActivity
  */
 public class SwipBackActivityS extends AppCompatActivity implements SwipeBackActivityBase{
     private SwipeBackActivityHelper mHelper;

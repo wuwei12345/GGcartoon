@@ -48,6 +48,7 @@ public class MainActivity extends FragmentActivity implements Initerface,RadioGr
         rgbottom= (RadioGroup) findViewById(R.id.rg_bottom);
         rgbottom.setOnCheckedChangeListener(this);
         Manager=getSupportFragmentManager();
+        //demo
     }
 
 

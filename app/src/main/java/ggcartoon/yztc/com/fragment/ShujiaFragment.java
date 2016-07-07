@@ -26,7 +26,6 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ggcartoon.yztc.com.Bean.ShouCang;
-import ggcartoon.yztc.com.ggcartoon.DTAtivity;
 import ggcartoon.yztc.com.ggcartoon.MainActivity;
 import ggcartoon.yztc.com.ggcartoon.ManHuaXiangQingActivity;
 import ggcartoon.yztc.com.ggcartoon.R;
@@ -49,7 +48,6 @@ public class ShujiaFragment extends Fragment implements Initerface,View.OnClickL
     TextView weishoucang;
     @Bind(R.id.shoucang_list)
     ListView shoucangList;
-    TextView loction;
     //listview
     private List<ShouCang> list;
     private ShouCangListAdapter shouCangListAdapter;
@@ -89,7 +87,6 @@ public class ShujiaFragment extends Fragment implements Initerface,View.OnClickL
     //初始化控件
     @Override
     public void initview() {
-        loction= (TextView) getActivity().findViewById(R.id.loction);
         iconImg= (ImageView) getActivity().findViewById(R.id.icon_img);
         shoucang= (TextView) getActivity().findViewById(R.id.shoucang);
         lishi= (TextView) getActivity().findViewById(R.id.lishi);
@@ -97,7 +94,6 @@ public class ShujiaFragment extends Fragment implements Initerface,View.OnClickL
         shoucangList= (ListView) getActivity().findViewById(R.id.shoucang_list);
         shoucangList.setOnItemClickListener(this);
         shoucangList.setOnItemLongClickListener(this);
-        loction.setOnClickListener(this);
     }
 
     @Override
@@ -141,10 +137,6 @@ public class ShujiaFragment extends Fragment implements Initerface,View.OnClickL
                 break;
             case R.id.lishi:
                 //listview显示历史记录
-                break;
-            case R.id.loction:
-                Intent intent=new Intent(getActivity(), DTAtivity.class);
-                startActivity(intent);
                 break;
         }
     }
