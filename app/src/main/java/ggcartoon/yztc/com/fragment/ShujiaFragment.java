@@ -26,6 +26,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ggcartoon.yztc.com.Bean.ShouCang;
+import ggcartoon.yztc.com.ggcartoon.LoginAcitivyt;
 import ggcartoon.yztc.com.ggcartoon.MainActivity;
 import ggcartoon.yztc.com.ggcartoon.ManHuaXiangQingActivity;
 import ggcartoon.yztc.com.ggcartoon.R;
@@ -35,11 +36,9 @@ import ggcartoon.yztc.com.initerface.Initerface;
  * 书架
  * A simple {@link Fragment} subclass.
  */
-public class ShujiaFragment extends Fragment implements Initerface,View.OnClickListener,AdapterView.OnItemLongClickListener,AdapterView.OnItemClickListener {
+public class ShujiaFragment extends Fragment implements Initerface, View.OnClickListener, AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener {
 
     //布局控件
-    @Bind(R.id.icon_img)
-    ImageView iconImg;
     @Bind(R.id.lishi)
     TextView lishi;
     @Bind(R.id.shoucang)
@@ -48,9 +47,12 @@ public class ShujiaFragment extends Fragment implements Initerface,View.OnClickL
     TextView weishoucang;
     @Bind(R.id.shoucang_list)
     ListView shoucangList;
+    @Bind(R.id.icon_img)
+    ImageView iconImg;
     //listview
     private List<ShouCang> list;
     private ShouCangListAdapter shouCangListAdapter;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -87,27 +89,28 @@ public class ShujiaFragment extends Fragment implements Initerface,View.OnClickL
     //初始化控件
     @Override
     public void initview() {
-        iconImg= (ImageView) getActivity().findViewById(R.id.icon_img);
-        shoucang= (TextView) getActivity().findViewById(R.id.shoucang);
-        lishi= (TextView) getActivity().findViewById(R.id.lishi);
-        weishoucang= (TextView) getActivity().findViewById(R.id.weishoucang);
-        shoucangList= (ListView) getActivity().findViewById(R.id.shoucang_list);
+        iconImg = (ImageView) getActivity().findViewById(R.id.icon_img);
+        shoucang = (TextView) getActivity().findViewById(R.id.shoucang);
+        lishi = (TextView) getActivity().findViewById(R.id.lishi);
+        weishoucang = (TextView) getActivity().findViewById(R.id.weishoucang);
+        shoucangList = (ListView) getActivity().findViewById(R.id.shoucang_list);
         shoucangList.setOnItemClickListener(this);
         shoucangList.setOnItemLongClickListener(this);
+        iconImg.setOnClickListener(this);
     }
 
     @Override
     public void initdata() {
         try {
             //获取数据库中收藏的数据，然后判断是否为空，不为空则设置adapter
-            list= MainActivity.dbUtils.findAll(ShouCang.class);
-            if (list!=null){
+            list = MainActivity.dbUtils.findAll(ShouCang.class);
+            if (list != null) {
                 shoucangList.setVisibility(View.VISIBLE);
-                shouCangListAdapter=new ShouCangListAdapter();
+                shouCangListAdapter = new ShouCangListAdapter();
                 shouCangListAdapter.notifyDataSetChanged();
                 shoucangList.setAdapter(shouCangListAdapter);
                 weishoucang.setVisibility(View.INVISIBLE);
-            }else{
+            } else {
                 shoucangList.setVisibility(View.INVISIBLE);
             }
         } catch (DbException e) {
@@ -128,9 +131,10 @@ public class ShujiaFragment extends Fragment implements Initerface,View.OnClickL
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()){
+        switch (v.getId()) {
             case R.id.icon_img:
-                //单击头像判断是否处于登录状态，是的话则跳转到个人信息页面，否则跳转到登录页面
+                Intent intent=new Intent(getActivity(), LoginAcitivyt.class);
+                startActivity(intent);
                 break;
             case R.id.shoucang:
                 //listview显示收藏的漫画
@@ -143,7 +147,7 @@ public class ShujiaFragment extends Fragment implements Initerface,View.OnClickL
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-        AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("确认删除收藏？");
         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
             @Override
@@ -155,15 +159,15 @@ public class ShujiaFragment extends Fragment implements Initerface,View.OnClickL
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 try {
-                    MainActivity.dbUtils.delete(ShouCang.class, WhereBuilder.b("title","=",list.get(position).getTitle()));
+                    MainActivity.dbUtils.delete(ShouCang.class, WhereBuilder.b("title", "=", list.get(position).getTitle()));
 
                 } catch (DbException e) {
                     e.printStackTrace();
                 }
                 list.remove(position);
-                Toast.makeText(getActivity(),"删除成功", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "删除成功", Toast.LENGTH_SHORT).show();
                 onStart();
-                if (list.size()==0){
+                if (list.size() == 0) {
                     shoucangList.setVisibility(View.INVISIBLE);
                     weishoucang.setVisibility(View.VISIBLE);
                     shouCangListAdapter.notifyDataSetChanged();
@@ -181,12 +185,13 @@ public class ShujiaFragment extends Fragment implements Initerface,View.OnClickL
         startActivity(intent);
     }
 
-    class ShouCangListAdapter extends BaseAdapter{
+
+    class ShouCangListAdapter extends BaseAdapter {
 
 
         @Override
         public int getCount() {
-            return list!=null?list.size():0;
+            return list != null ? list.size() : 0;
         }
 
         @Override
@@ -213,14 +218,15 @@ public class ShujiaFragment extends Fragment implements Initerface,View.OnClickL
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
-            ShouCang shoucang=list.get(position);
+            ShouCang shoucang = list.get(position);
             holder.tvTitle.setText(shoucang.getTitle());
-            holder.tvUpdateTime.setText("更新时间："+shoucang.getUpdateTime());
-            holder.tvLastCharpterTitle.setText("更新到："+shoucang.getLastCharpterTitle());
+            holder.tvUpdateTime.setText("更新时间：" + shoucang.getUpdateTime());
+            holder.tvLastCharpterTitle.setText("更新到：" + shoucang.getLastCharpterTitle());
 
             Picasso.with(parent.getContext()).load(shoucang.getThumb()).into(holder.ivThumb);
             return convertView;
         }
+
         class ViewHolder {
             ImageView ivThumb;
             TextView tvTitle, tvUpdateTime, tvLastCharpterTitle;

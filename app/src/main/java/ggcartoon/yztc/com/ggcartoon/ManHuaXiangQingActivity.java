@@ -175,7 +175,6 @@ public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initer
                 dialog.create().show();
                 break;
             default:
-
                 break;
         }
         return false;
