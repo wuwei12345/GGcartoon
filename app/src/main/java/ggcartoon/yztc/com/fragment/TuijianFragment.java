@@ -49,6 +49,7 @@ public class TuijianFragment extends Fragment implements Initerface{
     @Override
     public void initview() {
         mvp = (ViewPager) getActivity().findViewById(R.id.mvp);
+        mvp.setOffscreenPageLimit(4);
         mtabLayout= (TabLayout) getActivity().findViewById(R.id.tab_FindFragment_title);
         mhotFragment=new HotFragment();
         medtioFragment=new EdtioFragment();

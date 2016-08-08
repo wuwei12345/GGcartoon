@@ -1,26 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
-    <LinearLayout
-        android:layout_margin="5dp"
-        android:layout_centerHorizontal="true"
-        android:layout_width="wrap_content"
-        android:orientation="vertical"
-        android:layout_height="wrap_content">
-<com.makeramen.roundedimageview.RoundedImageView
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/round_iv"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:orientation="vertical">
+<com.facebook.drawee.view.SimpleDraweeView
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/round_iv"
+    android:layout_width="70dp"
+    android:layout_height="70dp"
     android:scaleType="center"
-    app:riv_corner_radius="30dip"
-    app:riv_border_width="2dip"
-    app:riv_border_color="#333333"
-    app:riv_mutate_background="true"
-    app:riv_tile_mode="repeat"
-    app:riv_oval="true"
+    fresco:failureImage="@drawable/app_icon"
+    fresco:roundAsCircle="true"
      />
     <TextView
         android:id="@+id/type_tv"
@@ -31,5 +23,4 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/round_iv"
          />
-    </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

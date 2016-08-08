@@ -1,67 +1,73 @@
 package ggcartoon.yztc.com.Adapter;
 
+import android.net.Uri;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.makeramen.roundedimageview.RoundedImageView;
-import com.squareup.picasso.Picasso;
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.List;
 
-import butterknife.Bind;
 import ggcartoon.yztc.com.Bean.TypeBean;
 import ggcartoon.yztc.com.ggcartoon.R;
 
 /**
  * Created by Administrator on 2016/5/30.
  */
-public class TypeAdapter extends BaseAdapter {
-    private List<TypeBean.DataBean> list;
+public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
+    List<TypeBean.DataBean> list;
 
-    public void setData(List<TypeBean.DataBean> list) {
+    public TypeAdapter(List<TypeBean.DataBean> list) {
         this.list = list;
-        notifyDataSetChanged();
     }
 
     @Override
-    public int getCount() {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        ViewHolder vh = new ViewHolder(LayoutInflater.from(parent.getContext()).
+                inflate(R.layout.type_list_item, parent, false));
+        return vh;
+    }
+
+    @Override
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+            holder.roundIv.setImageURI(Uri.parse(list.get(position).getThumb()));
+            holder.typeTv.setText(list.get(position).getTitle());
+        if (monItemClickLinener!=null){
+            holder.roundIv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    monItemClickLinener.onItemClick(holder.itemView,holder.getLayoutPosition());
+                }
+            });
+        }
+    }
+
+    @Override
+    public int getItemCount() {
         return list != null ? list.size() : 0;
     }
+    //单击事件
+    public interface onItemClickLintener {
+        void onItemClick(View view, int position);
 
-    @Override
-    public Object getItem(int position) {
-        return list.get(position);
+        void onItemLongClick(View view, int Position);
     }
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
+    private onItemClickLintener monItemClickLinener;
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder vh;
-        if (convertView == null) {
-            vh=new ViewHolder();
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.type_list_item, null);
-            vh.roundIv= (RoundedImageView) convertView.findViewById(R.id.round_iv);
-            vh.typeTv= (TextView) convertView.findViewById(R.id.type_tv);
-            convertView.setTag(vh);
-        } else {
-            vh= (ViewHolder) convertView.getTag();
-        }
-        vh.typeTv.setText(list.get(position).getTitle());
-        Picasso.with(parent.getContext()).load(list.get(position).getThumb()).into(vh.roundIv);
-        return convertView;
+    public void setonItemClickLintener(onItemClickLintener monItemClickLinener) {
+        this.monItemClickLinener = monItemClickLinener;
     }
-
-     class ViewHolder {
-        @Bind(R.id.round_iv)
-        RoundedImageView roundIv;
-        @Bind(R.id.type_tv)
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        SimpleDraweeView roundIv;
         TextView typeTv;
+        public ViewHolder(View itemView) {
+            super(itemView);
+            roundIv= (SimpleDraweeView) itemView.findViewById(R.id.round_iv);
+            typeTv= (TextView) itemView.findViewById(R.id.type_tv);
+        }
     }
 }

@@ -33,13 +33,12 @@ import ggcartoon.yztc.com.Adapter.ManHuaXiangQingAdapter;
 import ggcartoon.yztc.com.Bean.ManHuaXiangQing;
 import ggcartoon.yztc.com.Bean.ShouCang;
 import ggcartoon.yztc.com.View.DividerItemDecoration;
+import ggcartoon.yztc.com.View.OkHttpUtils;
 import ggcartoon.yztc.com.View.SelectPicPopupWindow;
 import ggcartoon.yztc.com.View.SwipBackActivityS;
 import ggcartoon.yztc.com.initerface.Initerface;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.Response;
 
 //漫画详情页面
@@ -73,53 +72,33 @@ public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initer
             switch (msg.what) {
                 case 1:
                     //装载adapter
-                    adapter = new ManHuaXiangQingAdapter(MH.getComicSrc());
-                    recyclerView.setAdapter(adapter);
-                    collapsingToolbarLayout.setTitle(MH.getTitle());
-                    //通过CollapsingToolbarLayout修改字体颜色
-                    collapsingToolbarLayout.setBackgroundColor(Color.WHITE);
-                    collapsingToolbarLayout.setExpandedTitleColor(Color.WHITE);//设置还没收缩时状态下字体颜色
-                    collapsingToolbarLayout.setCollapsedTitleTextColor(Color.WHITE);//设置收缩后Toolbar上字体的颜色
-                    //漫画图片
-                    Picasso.with(ManHuaXiangQingActivity.this).load(MH.getThumb()).into(mhxqImage);
-                    adapter.setOnItemClickLitener(new ManHuaXiangQingAdapter.OnItemClickLitener() {
-                        @Override
-                        public void onItemClick(View view, int position) {
-                            window=new SelectPicPopupWindow(ManHuaXiangQingActivity.this,MH.getComicSrc().get(position).getId(),TitleName,Id);
-                            window.showAtLocation((ManHuaXiangQingActivity.this.findViewById(R.id.mains)), Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
-                        }
+                    if (MH!=null) {
+                        adapter = new ManHuaXiangQingAdapter(MH.getComicSrc());
+                        recyclerView.setAdapter(adapter);
+                        collapsingToolbarLayout.setTitle(MH.getTitle());
+                        //通过CollapsingToolbarLayout修改字体颜色
+                        collapsingToolbarLayout.setBackgroundColor(Color.WHITE);
+                        collapsingToolbarLayout.setExpandedTitleColor(Color.WHITE);//设置还没收缩时状态下字体颜色
+                        collapsingToolbarLayout.setCollapsedTitleTextColor(Color.WHITE);//设置收缩后Toolbar上字体的颜色
+                        //漫画图片
+                        Picasso.with(ManHuaXiangQingActivity.this).load(MH.getThumb()).into(mhxqImage);
+                        adapter.setOnItemClickLitener(new ManHuaXiangQingAdapter.OnItemClickLitener() {
+                            @Override
+                            public void onItemClick(View view, int position) {
+                                window = new SelectPicPopupWindow(ManHuaXiangQingActivity.this, MH.getComicSrc().get(position).getId(), TitleName, Id);
+                                window.showAtLocation((ManHuaXiangQingActivity.this.findViewById(R.id.mains)), Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
+                            }
 
-                        @Override
-                        public void onItemLongClick(View view, int position) {
+                            @Override
+                            public void onItemLongClick(View view, int position) {
 
-                        }
-                    });
-                    //设置标题
-//                    title.setText(MH.getTitle());
-////                    tv_pingluncount.setText(MH.getTucaos());
-//                    //作者
-//                    zuozhe.setText(MH.getAuthorName());
-//                    //类型
-//                    leixing.setText(MH.getComicType());
-//                    //地区
-//                    diqi.setText(MH.getAreaName());
-//                    //简介
-//                    jianjie.setText(MH.getIntro());
-                    //Item点击事件
-//                    lv_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//                        @Override
-//                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                            //把单击的item的值存储
-//                            lvcount = position;
-//                            //点击携带相应数据跳转到漫画页面
-//                            Intent intent = new Intent(ManHuaXiangQingActivity.this, ManHuaZhangJieActivity.class);
-//                            intent.putExtra("id", MH.getComicSrc().get(position).getId());
-//                            intent.putExtra("titlebar", TitleName);
-//                            intent.putExtra("comIcid", Id);
-////                            System.out.println("--->"+MH.getComicSrc().get(position).getId()+"--->"+TitleName+"--->"+Id);
-//                            startActivity(intent);
-//                        }
-//                    });
+                            }
+                        });
+                    }else{
+                        Toast.makeText(ManHuaXiangQingActivity.this,"该漫画因为版权原因已被下架", Toast.LENGTH_SHORT).show();
+                        ManHuaXiangQingActivity.this.finish();
+
+                    }
                     break;
                 case 2:
                     Toast.makeText(ManHuaXiangQingActivity.this, "网络获取失败", Toast.LENGTH_SHORT).show();
@@ -208,7 +187,7 @@ public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initer
     @Override
     public void initdata() {
         setSupportActionBar(toolbar);
-        //回执返回图标
+        //设置返回图标
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //单击返回
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -228,7 +207,7 @@ public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initer
     @Override
     public void initviewoper() {
         //访问网络数据的方法
-        run(path);
+            run(path);
         //收藏
         fabDetail.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -267,30 +246,31 @@ public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initer
 
 
     //加载网络数据
-    void run(String url) {
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url(url).build();
-        Call call = client.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                handler.sendEmptyMessage(2);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String json = response.body().string();
-                try {
-                    //json解析操作
-                    JSONObject jsonobj = new JSONObject(json);
-                    JSONObject jsonobj2 = jsonobj.getJSONObject("data");
-                    MH = JSON.parseObject(jsonobj2.toString(), ManHuaXiangQing.DataBean.class);
-                } catch (Exception e) {
-                    e.printStackTrace();
+    void run(String url){
+        try {
+            OkHttpUtils.run(url).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    handler.sendEmptyMessage(2);
                 }
-                handler.sendEmptyMessage(1);
-            }
-        });
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String json = response.body().string();
+                    try {
+                        //json解析操作
+                        JSONObject jsonobj = new JSONObject(json);
+                        JSONObject jsonobj2 = jsonobj.getJSONObject("data");
+                        MH = JSON.parseObject(jsonobj2.toString(), ManHuaXiangQing.DataBean.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    handler.sendEmptyMessage(1);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 

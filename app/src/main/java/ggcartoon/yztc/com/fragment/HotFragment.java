@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -35,16 +34,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import ggcartoon.yztc.com.Adapter.GrideAdapter;
 import ggcartoon.yztc.com.Bean.GridBean;
 import ggcartoon.yztc.com.Bean.Head;
+import ggcartoon.yztc.com.View.MyGirdView;
+import ggcartoon.yztc.com.View.OkHttpUtils;
 import ggcartoon.yztc.com.ggcartoon.ManHuaXiangQingActivity;
 import ggcartoon.yztc.com.ggcartoon.R;
 import ggcartoon.yztc.com.initerface.Initerface;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.Response;
 
 /**
@@ -52,10 +53,10 @@ import okhttp3.Response;
  * A simple {@link Fragment} subclass.
  */
 public class HotFragment extends Fragment implements Initerface, ViewPager.OnPageChangeListener {
+    @Bind(R.id.Hot_MyGirdView)
+    MyGirdView HotMyGirdView;
     //viewpage
     private ViewPager mHeadvp;
-    //MyGirdView网格视图
-    private GridView myGirdView;
     //用来存放获取的数据
     private List<Head.DataBean> list;
     //广告栏的网址
@@ -95,9 +96,8 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
                 case 1:
                     mProgressBar.setVisibility(View.INVISIBLE);
                     //列表中展示数据
-                    GrideAdapter adapter = new GrideAdapter();
-                    adapter.SetDatas(Gridelist);
-                    myGirdView.setAdapter(adapter);
+                    GrideAdapter adapter = new GrideAdapter(Gridelist);
+                    HotMyGirdView.setAdapter(adapter);
                     hotScrollView.onRefreshComplete();
                     //加载后返回到最顶部
                     hotScrollView.getRefreshableView().fullScroll(0);
@@ -125,7 +125,9 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_hot, container, false);
+        View view = inflater.inflate(R.layout.fragment_hot, container, false);
+        ButterKnife.bind(this, view);
+        return view;
     }
 
     @Override
@@ -140,24 +142,14 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
     @Override
     public void initview() {
         mHeadvp = (ViewPager) getActivity().findViewById(R.id.head_vp);
-        myGirdView = (GridView) getActivity().findViewById(R.id.hot_gird_view);
 //        http = new HttpUtils();
         imageres = new ArrayList<ImageView>();
         titleres = new ArrayList<String>();
         tvTitle = (TextView) getActivity().findViewById(R.id.tv_title);
         mProgressBar = (ProgressBar) getActivity().findViewById(R.id.hot_pb);
         hotScrollView = (PullToRefreshScrollView) getActivity().findViewById(R.id.hot_pulltorefresh);
-        //GirdView item点击监听事件
-        myGirdView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //调到相应的漫画简介界面，把对应的漫画名字id传过去
-                Intent intent = new Intent(getActivity(), ManHuaXiangQingActivity.class);
-                intent.putExtra("comicId", Gridelist.get(position).getComicId());
-                intent.putExtra("title", Gridelist.get(position).getTitle());
-                startActivity(intent);
-            }
-        });
+        //RecyclerView初始化为网格状，3列
+//        HotRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         hotScrollView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener2<ScrollView>() {
             @Override
             public void onPullDownToRefresh(PullToRefreshBase<ScrollView> refreshView) {
@@ -173,7 +165,18 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
                 initHeadvpData();
             }
         });
+        HotMyGirdView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //跳到相应的漫画简介界面，把对应的漫画名字id传过去
+                Intent intent = new Intent(getActivity(), ManHuaXiangQingActivity.class);
+                intent.putExtra("comicId", Gridelist.get(position).getComicId());
+                intent.putExtra("title", Gridelist.get(position).getTitle());
+                startActivity(intent);
+            }
+        });
     }
+
     @Override
     public void initdata() {
         mProgressBar.setVisibility(View.VISIBLE);
@@ -184,34 +187,35 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
         //获取漫画数据并填充
         initPullRefreshData();
     }
+
     //获取数据
     private void initPullRefreshData() {
         String url = gvPath + currenindex++;
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url(url).build();
-        Call call = client.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                mhandler.sendEmptyMessage(3);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String json = response.body().string();
-                try {
-                    JSONObject jsonobject = new JSONObject(json);
-                    JSONArray jsonarray = jsonobject.getJSONArray("data");
-                    Gridelist = JSON.parseArray(jsonarray.toString(), GridBean.DataBean.class);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+        try {
+            OkHttpUtils.run(url).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    mhandler.sendEmptyMessage(3);
                 }
-                mhandler.sendEmptyMessage(1);
-            }
-        });
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String json = response.body().string();
+                    try {
+                        JSONObject jsonobject = new JSONObject(json);
+                        JSONArray jsonarray = jsonobject.getJSONArray("data");
+                        Gridelist = JSON.parseArray(jsonarray.toString(), GridBean.DataBean.class);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    mhandler.sendEmptyMessage(1);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
-
 
 
     //初始化上下拉刷新
@@ -229,33 +233,34 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
     //广告获取内容
     private void initHeadvpData() {
 
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url(vppath).build();
-        Call call = client.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                mhandler.sendEmptyMessage(3);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String json = response.body().string();
-                try {
-                    String obj = com.alibaba.fastjson.JSONObject.parseObject(json).getString("data");
-                    list = com.alibaba.fastjson.JSONArray.parseArray(obj.toString(), Head.DataBean.class);
-                    for (int i = 0; i < list.size(); i++) {
-                        imageview = new ImageView(getActivity());
-                        bitmapUtils.display(imageview, list.get(i).getThumb());
-                        titleres.add(list.get(i).getTitle());
-                        imageres.add(imageview);
-                    }
-                    mhandler.sendEmptyMessage(0);
-                } catch (Exception e) {
-                    e.printStackTrace();
+        try {
+            OkHttpUtils.run(vppath).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    mhandler.sendEmptyMessage(3);
                 }
-            }
-        });
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String json = response.body().string();
+                    try {
+                        String obj = com.alibaba.fastjson.JSONObject.parseObject(json).getString("data");
+                        list = com.alibaba.fastjson.JSONArray.parseArray(obj.toString(), Head.DataBean.class);
+                        for (int i = 0; i < list.size(); i++) {
+                            imageview = new ImageView(getActivity());
+                            bitmapUtils.display(imageview, list.get(i).getThumb());
+                            titleres.add(list.get(i).getTitle());
+                            imageres.add(imageview);
+                        }
+                        mhandler.sendEmptyMessage(0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -281,6 +286,12 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
     @Override
     public void onPageScrollStateChanged(int state) {
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 
     class HeadvpAdapter extends PagerAdapter {

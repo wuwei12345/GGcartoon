@@ -1,18 +1,22 @@
 package ggcartoon.yztc.com.Adapter;
 
-import android.graphics.Bitmap;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.backends.pipeline.PipelineDraweeController;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import ggcartoon.yztc.com.Bean.GridBean;
 import ggcartoon.yztc.com.ggcartoon.R;
 
@@ -21,18 +25,20 @@ import ggcartoon.yztc.com.ggcartoon.R;
  */
 public class GrideAdapter extends BaseAdapter {
     List<GridBean.DataBean> list;
-    public void SetDatas(List<GridBean.DataBean> list){
-        this.list=list;
+
+    public GrideAdapter(List<GridBean.DataBean> list) {
+        this.list = list;
         notifyDataSetChanged();
     }
+
     @Override
     public int getCount() {
-        return list!=null?list.size():0;
+        return list.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return list!=null?list.get(position):null;
+        return list.get(position);
     }
 
     @Override
@@ -42,33 +48,99 @@ public class GrideAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
-        if (convertView==null){
-            holder=new ViewHolder();
-        convertView= LayoutInflater.from(parent.getContext()).inflate(R.layout.gridview_item,null);
-            holder.ivThumb= (ImageView) convertView.findViewById(R.id.iv_thumb);
-            holder.tvTitle= (TextView) convertView.findViewById(R.id.tv_title);
-            holder.tvName= (TextView) convertView.findViewById(R.id.tv_name);
+        ViewHolder holder = null;
+        if (convertView == null) {
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.gridview_item, parent, false);
+            holder = new ViewHolder(convertView);
             convertView.setTag(holder);
         }else{
-        holder= (ViewHolder) convertView.getTag();
+            holder= (ViewHolder) convertView.getTag();
         }
-    GridBean.DataBean gridBean=list.get(position);
-        holder.tvTitle.setText(gridBean.getTitle());
-        holder.tvName.setText(gridBean.getLastCharpter().getTitle());
-        String thumb=gridBean.getThumb();
-//        Picasso.with(parent.getContext()).load(thumb).memoryPolicy( MemoryPolicy.NO_STORE).networkPolicy( NetworkPolicy.OFFLINE).priority(Picasso.Priority.HIGH).into(holder.ivThumb);
-       // 设置加载前的图片，加载中的图片，设置下载的图片是否缓存在内存中，设置图片解码的类型
-        DisplayImageOptions options = new DisplayImageOptions.Builder().
-                showImageOnLoading(R.drawable.icon_error_warn).
-                showImageOnFail(R.drawable.loading_1).cacheInMemory(true).
-                bitmapConfig(Bitmap.Config.RGB_565).build();
-        ImageLoader.getInstance().displayImage(thumb, holder.ivThumb, options);//显示图片
-//        Picasso.with(parent.getContext()).load(thumb).into(holder.ivThumb);
+        //图片渐进式加载
+        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(list.get(position).getThumb()))
+                .setProgressiveRenderingEnabled(true).build();
+        PipelineDraweeController controller = (PipelineDraweeController) Fresco.newDraweeControllerBuilder().setImageRequest(request)
+                .setOldController(holder.ivThumb.getController()).build();
+        holder.ivThumb.setController(controller);
+        holder.tvName.setText(list.get(position).getLastCharpter().getTitle());
+        holder.tvTitle.setText(list.get(position).getTitle());
         return convertView;
     }
-    class ViewHolder{
-        ImageView ivThumb;
-        TextView tvTitle,tvName;
+
+    static class ViewHolder {
+        @Bind(R.id.iv_thumb)
+        SimpleDraweeView ivThumb;
+        @Bind(R.id.tv_title)
+        TextView tvTitle;
+        @Bind(R.id.tv_name)
+        TextView tvName;
+
+        ViewHolder(View view) {
+            ButterKnife.bind(this, view);
+        }
     }
+
+//    class ViewHolder {
+//        SimpleDraweeView ivThumb;
+//        TextView tvTitle, tvName;
+//    }
+//    @Override
+//    public HotViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+//        HotViewHolder holder = new HotViewHolder(LayoutInflater.from(parent.getContext()).
+//                inflate(R.layout.gridview_item, parent, false));
+//        return holder;
+//    }
+//
+//    @Override
+//    public void onBindViewHolder(final HotViewHolder holder, int position) {
+//        //图片渐进式加载
+//        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(list.get(position).getThumb()))
+//                .setProgressiveRenderingEnabled(true).build();
+//        PipelineDraweeController controller = (PipelineDraweeController) Fresco.newDraweeControllerBuilder().setImageRequest(request)
+//                .setOldController(holder.ivThumb.getController()).build();
+//        holder.ivThumb.setController(controller);
+//        holder.tvName.setText(list.get(position).getLastCharpter().getTitle());
+//        holder.tvTitle.setText(list.get(position).getTitle());
+//        if (monItemClickLinener != null) {
+//            holder.ivThumb.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    monItemClickLinener.onItemClick(holder.itemView, holder.getLayoutPosition());
+//                }
+//            });
+//
+//        }
+//    }
+//
+//    @Override
+//    public int getItemCount() {
+//        return list!=null?list.size():0;
+//    }
+//
+//    //单击事件
+//    public interface onItemClickLintener {
+//        void onItemClick(View view, int position);
+//
+//        void onItemLongClick(View view, int Position);
+//    }
+//
+//    private onItemClickLintener monItemClickLinener;
+//
+//    public void setonItemClickLintener(onItemClickLintener monItemClickLinener) {
+//        this.monItemClickLinener = monItemClickLinener;
+//    }
+//
+//    public class HotViewHolder extends RecyclerView.ViewHolder {
+//        SimpleDraweeView ivThumb;
+//        TextView tvTitle, tvName;
+//
+//        public HotViewHolder(View inflate) {
+//            super(inflate);
+//            ivThumb = (SimpleDraweeView) inflate.findViewById(R.id.iv_thumb);
+//            tvTitle = (TextView) inflate.findViewById(R.id.tv_title);
+//            tvName = (TextView) inflate.findViewById(R.id.tv_name);
+//        }
+//    }
+
+
 }

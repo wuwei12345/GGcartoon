@@ -4,10 +4,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.GridView;
 
-/**
- * * @author 作者 E-mail: * @date 创建时间：2015年10月30日 下午7:46:23 * @version 1.0
- * * @parameter * @since * @return
- */
 public class MyGirdView extends GridView {
 
 	public MyGirdView(Context context) {

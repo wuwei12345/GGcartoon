@@ -25,13 +25,12 @@
         android:background="@drawable/search"
         />
 </LinearLayout>
-<GridView
+<android.support.v7.widget.RecyclerView
     android:id="@+id/FL_list"
     android:layout_width="match_parent"
     android:layout_height="0dp"
     android:layout_weight="7"
-    android:numColumns="4"
     android:padding="10dp"
-    ></GridView>
+    ></android.support.v7.widget.RecyclerView>
 
 </LinearLayout>

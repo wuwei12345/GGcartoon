@@ -7,50 +7,47 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshScrollView;
-import com.lidroid.xutils.HttpUtils;
+import com.alibaba.fastjson.JSONObject;
+import com.jcodecraeer.xrecyclerview.ProgressStyle;
+import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import ggcartoon.yztc.com.Adapter.GrideAdapter;
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import ggcartoon.yztc.com.Adapter.XgrideAdapter;
 import ggcartoon.yztc.com.Bean.GridBean;
-import ggcartoon.yztc.com.View.MyGirdView;
+import ggcartoon.yztc.com.View.OkHttpUtils;
 import ggcartoon.yztc.com.ggcartoon.ManHuaXiangQingActivity;
 import ggcartoon.yztc.com.ggcartoon.R;
 import ggcartoon.yztc.com.initerface.Initerface;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.Response;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class EdtioFragment extends Fragment implements Initerface {
-    //网络请求
-    private HttpUtils mhttp;
-    //网格视图
-    private MyGirdView myGridView;
+    @Bind(R.id.edtio_recyclerView)
+    XRecyclerView edtioRecyclerView;
     //接口请求要传的ID
     private int currentindex = 1;
     //加载显示
     private ProgressBar pb;
     //Bean目录
     private List<GridBean.DataBean> list;
-    //上下拉刷新
-    private PullToRefreshScrollView edtioScrollView;
+    XgrideAdapter adapter;
     Handler mhandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -58,16 +55,42 @@ public class EdtioFragment extends Fragment implements Initerface {
                 case 1:
                     pb.setVisibility(View.INVISIBLE);
                     //设置adapter
-                    GrideAdapter adapter = new GrideAdapter();
-                    adapter.SetDatas(list);
-                    myGridView.setAdapter(adapter);
+                    adapter = new XgrideAdapter(list);
+                    edtioRecyclerView.setAdapter(adapter);
+                    adapter.setonItemClickLintener(new XgrideAdapter.onItemClickLintener() {
+                        @Override
+                        public void onItemClick(View view, int position) {
+                            Intent intent = new Intent(getActivity(), ManHuaXiangQingActivity.class);
+                            intent.putExtra("comicId", list.get(position-2).getComicId());
+                            intent.putExtra("title", list.get(position-2).getTitle());
+                            startActivity(intent);
+                        }
+
+                        @Override
+                        public void onItemLongClick(View view, int Position) {
+
+                        }
+                    });
+
                     //停止刷新
-                    edtioScrollView.onRefreshComplete();
+                    edtioRecyclerView.refreshComplete();
+                    edtioRecyclerView.loadMoreComplete();
+//                    edtioScrollView.onRefreshComplete();
                     //返回顶部
-                    edtioScrollView.getRefreshableView().fullScroll(0);
+//                    edtioScrollView.getRefreshableView().fullScroll(0);
                     break;
                 case 2:
                     Toast.makeText(getActivity(), "获取网络数据失败，请检查网络", Toast.LENGTH_SHORT).show();
+                    break;
+                case 3:
+                   adapter = new XgrideAdapter(list);
+                    adapter.notifyDataSetChanged();
+                    //停止刷新
+                    edtioRecyclerView.refreshComplete();
+                    edtioRecyclerView.loadMoreComplete();
+                    break;
+                case 4:
+                    Toast.makeText(getActivity(), "没有更多", Toast.LENGTH_SHORT).show();
                     break;
                 default:
 
@@ -80,7 +103,9 @@ public class EdtioFragment extends Fragment implements Initerface {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_edtio, container, false);
+        View view = inflater.inflate(R.layout.fragment_edtio, container, false);
+        ButterKnife.bind(this, view);
+        return view;
     }
 
     @Override
@@ -90,100 +115,77 @@ public class EdtioFragment extends Fragment implements Initerface {
         initdata();
         initviewoper();
     }
-
+    private ArrayList<View> mHeaderViews = new ArrayList<>();
+    private ArrayList<View> mFootViews = new ArrayList<>();
     //控件初始化
     @Override
     public void initview() {
-        mhttp = new HttpUtils();
-        myGridView = (MyGirdView) getActivity().findViewById(R.id.grid_view);
         pb = (ProgressBar) getActivity().findViewById(R.id.pb);
-        edtioScrollView = (PullToRefreshScrollView) getActivity().findViewById(R.id.edtio_pulltorefresh);
-        //GridView条目单机事件
-        myGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), ManHuaXiangQingActivity.class);
-                intent.putExtra("comicId", list.get(position).getComicId());
-                intent.putExtra("title", list.get(position).getTitle());
-                startActivity(intent);
-            }
-        });
-        edtioScrollView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener2<ScrollView>() {
-            @Override
-            public void onPullDownToRefresh(PullToRefreshBase<ScrollView> refreshView) {
-                initdata();
-            }
+        //RecyclerView初始化
+        edtioRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+      View head=LayoutInflater.from(getActivity()).inflate(R.layout.recyclerview_header,
+              (ViewGroup) edtioRecyclerView.findViewById(R.id.content),false);
 
-            @Override
-            public void onPullUpToRefresh(PullToRefreshBase<ScrollView> refreshView) {
-                initdata();
-            }
-        });
+        edtioRecyclerView.addHeaderView(head);
     }
 
 
-    //初始化上下拉刷新
-    private void initScrollView() {
-        edtioScrollView.setMode(PullToRefreshBase.Mode.BOTH);
-        edtioScrollView.setPullLabel("下拉刷新", PullToRefreshBase.Mode.PULL_FROM_START);
-        edtioScrollView.setRefreshingLabel("正在加载...", PullToRefreshBase.Mode.PULL_FROM_START);
-        edtioScrollView.setReleaseLabel("放开刷新", PullToRefreshBase.Mode.PULL_FROM_START);
-        edtioScrollView.setPullLabel("上拉加载", PullToRefreshBase.Mode.PULL_FROM_END);
-        edtioScrollView.setRefreshingLabel("正在加载...", PullToRefreshBase.Mode.PULL_FROM_END);
-        edtioScrollView.setReleaseLabel("放开加载", PullToRefreshBase.Mode.PULL_FROM_END);
-    }
+
 
     //获取网络数据
     @Override
     public void initdata() {
         String path = "http://csapi.dm300.com:21889/android/recom/editorlist?pagesize=30&page=" + currentindex++;
-//        mhttp.send(HttpRequest.HttpMethod.GET, path, new RequestCallBack<String>() {
-//            @Override
-//            public void onLoading(long total, long current, boolean isUploading) {
-//                super.onLoading(total, current, isUploading);
-//                if (!isUploading) {
-//                    pb.setVisibility(View.VISIBLE);
-//                }
-//            }
-//
-//            @Override
-//            public void onSuccess(ResponseInfo<String> responseInfo) {
-//                //json解析
-//                String json = responseInfo.result;
-//                String obj = com.alibaba.fastjson.JSONObject.parseObject(json).getString("data");
-//                list = JSONArray.parseArray(obj.toString(), GridBean.DataBean.class);
-//                pb.setVisibility(View.INVISIBLE);
-//                mhandler.sendEmptyMessage(1);
-//                edtioScrollView.getRefreshableView().fullScroll(0);
-//            }
-//
-//            @Override
-//            public void onFailure(HttpException e, String s) {
-//                Toast.makeText(getActivity(), "获取网络数据失败，请检查网络", Toast.LENGTH_SHORT).show();
-//
-//            }
-//        });
-        OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().url(path).build();
-        Call call=client.newCall(request);
-        call.enqueue(new Callback() {
+        try {
+            OkHttpUtils.run(path).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    mhandler.sendEmptyMessage(2);
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String json = response.body().string();
+                    if (JSONObject.parseObject(json).getString("data")!=null){
+                    String obj = JSONObject.parseObject(json).getString("data");
+                    if (list==null){
+                        list = JSONArray.parseArray(obj.toString(), GridBean.DataBean.class);
+                        mhandler.sendEmptyMessageDelayed(1,2000);
+                    }else{
+                        list.addAll(JSONArray.parseArray(obj.toString(), GridBean.DataBean.class));
+                        mhandler.sendEmptyMessageDelayed(3,2000);
+                    }
+                }else{
+                        mhandler.sendEmptyMessage(4);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void initviewoper() {
+        //设置上拉刷新和下拉加载的主题样式
+        edtioRecyclerView.setRefreshProgressStyle(ProgressStyle.BallPulse);
+        edtioRecyclerView.setLoadingMoreProgressStyle(ProgressStyle.SquareSpin);
+        edtioRecyclerView.setLoadingListener(new XRecyclerView.LoadingListener() {
             @Override
-            public void onFailure(Call call, IOException e) {
-               mhandler.sendEmptyMessage(2);
+            public void onRefresh() {
+                initdata();
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String json=response.body().string();
-                String obj = com.alibaba.fastjson.JSONObject.parseObject(json).getString("data");
-                list = JSONArray.parseArray(obj.toString(), GridBean.DataBean.class);
-                mhandler.sendEmptyMessage(1);
+            public void onLoadMore() {
+                initdata();
             }
         });
     }
 
     @Override
-    public void initviewoper() {
-        initScrollView();
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 }

@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_margin="2dp"
     android:padding="2dp"
     android:layout_height="70dp">
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/gengxin_iv"
         android:layout_width="60dp"
         android:layout_height="80dp"
-        android:src="@drawable/app_icon"
+        fresco:placeholderImage="@drawable/app_icon"
         />
 <LinearLayout
     android:layout_width="wrap_content"

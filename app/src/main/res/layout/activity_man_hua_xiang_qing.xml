@@ -61,4 +61,8 @@
             android:scrollbars="none"
             />
     </LinearLayout>
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/simpimage"
+        android:layout_width="150dp"
+        android:layout_height="150dp" />
 </android.support.design.widget.CoordinatorLayout>
