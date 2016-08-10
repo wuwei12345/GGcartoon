@@ -227,7 +227,6 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
         hotScrollView.setPullLabel("上拉加载", PullToRefreshBase.Mode.PULL_FROM_END);
         hotScrollView.setRefreshingLabel("正在加载...", PullToRefreshBase.Mode.PULL_FROM_END);
         hotScrollView.setReleaseLabel("放开加载", PullToRefreshBase.Mode.PULL_FROM_END);
-
     }
 
     //广告获取内容

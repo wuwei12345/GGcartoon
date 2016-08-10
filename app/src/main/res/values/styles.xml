@@ -15,6 +15,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+    <!--背景透明-->
     <style name="otherPageStyle" parent="AppTheme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="windowActionBar">false</item>

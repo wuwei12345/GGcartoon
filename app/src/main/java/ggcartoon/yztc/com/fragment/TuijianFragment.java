@@ -49,6 +49,7 @@ public class TuijianFragment extends Fragment implements Initerface{
     @Override
     public void initview() {
         mvp = (ViewPager) getActivity().findViewById(R.id.mvp);
+        //设置要缓存的页面
         mvp.setOffscreenPageLimit(4);
         mtabLayout= (TabLayout) getActivity().findViewById(R.id.tab_FindFragment_title);
         mhotFragment=new HotFragment();

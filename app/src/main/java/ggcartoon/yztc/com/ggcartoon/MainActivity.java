@@ -26,7 +26,6 @@ public class MainActivity extends FragmentActivity implements Initerface,RadioGr
     private FenleiFragment fenleiFragment;
     private GengduoFragment gengduoFragment;
 
-//    public static SharedPreferences sp;
     //存储漫画
     public static DbUtils dbUtils;
     //fragment管理器
