@@ -13,7 +13,7 @@ import retrofit2.http.QueryMap;
  */
 public class RetrofitUtils {
    public  interface  HeadJK{
-//       ?pagesize=30&page={pageindex}
+//       ?pagesize=30&page={pageindex}////
         @GET("hotlist")
         Call<GridBean> repoDataBean(@Path("pageindex")String path, @QueryMap()HashMap<String,String> params);
 
