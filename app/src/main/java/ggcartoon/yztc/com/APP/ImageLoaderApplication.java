@@ -34,7 +34,6 @@ public class ImageLoaderApplication extends Application {
 		builder.threadPriority(Thread.MAX_PRIORITY);//设置当前线程的优先级
 		builder.memoryCache(new WeakMemoryCache());//使用弱引用来缓存图片
 		loader.init(builder.build());//开始构建
-
 		Fresco.initialize(getApplicationContext());
 	}
 	

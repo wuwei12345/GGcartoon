@@ -8,10 +8,13 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
@@ -41,6 +44,10 @@ import okhttp3.Response;
 public class EdtioFragment extends Fragment implements Initerface {
     @Bind(R.id.edtio_recyclerView)
     XRecyclerView edtioRecyclerView;
+    @Bind(R.id.edtio_relativelayout)
+    RelativeLayout edtioRelativelayout;
+    @Bind(R.id.again_loading)
+    TextView againLoading;
     //接口请求要传的ID
     private int currentindex = 1;
     //加载显示
@@ -61,8 +68,8 @@ public class EdtioFragment extends Fragment implements Initerface {
                         @Override
                         public void onItemClick(View view, int position) {
                             Intent intent = new Intent(getActivity(), ManHuaXiangQingActivity.class);
-                            intent.putExtra("comicId", list.get(position-2).getComicId());
-                            intent.putExtra("title", list.get(position-2).getTitle());
+                            intent.putExtra("comicId", list.get(position - 1).getComicId());
+                            intent.putExtra("title", list.get(position - 1).getTitle());
                             startActivity(intent);
                         }
 
@@ -81,9 +88,22 @@ public class EdtioFragment extends Fragment implements Initerface {
                     break;
                 case 2:
                     Toast.makeText(getActivity(), "获取网络数据失败，请检查网络", Toast.LENGTH_SHORT).show();
+                    //隐藏列表
+                    edtioRelativelayout.setVisibility(View.GONE);
+                    //显示提示
+                    againLoading.setVisibility(View.VISIBLE);
+                    againLoading.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            initdata();
+                            edtioRelativelayout.setVisibility(View.VISIBLE);
+                            againLoading.setVisibility(View.GONE);
+                            pb.setVisibility(View.VISIBLE);
+                        }
+                    });
                     break;
                 case 3:
-                   adapter = new XgrideAdapter(list);
+                    adapter = new XgrideAdapter(list);
                     adapter.notifyDataSetChanged();
                     //停止刷新
                     edtioRecyclerView.refreshComplete();
@@ -115,21 +135,21 @@ public class EdtioFragment extends Fragment implements Initerface {
         initdata();
         initviewoper();
     }
+
     private ArrayList<View> mHeaderViews = new ArrayList<>();
     private ArrayList<View> mFootViews = new ArrayList<>();
+
     //控件初始化
     @Override
     public void initview() {
         pb = (ProgressBar) getActivity().findViewById(R.id.pb);
         //RecyclerView初始化
         edtioRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
-      View head=LayoutInflater.from(getActivity()).inflate(R.layout.recyclerview_header,
-              (ViewGroup) edtioRecyclerView.findViewById(R.id.content),false);
-
-        edtioRecyclerView.addHeaderView(head);
+//        View header=LayoutInflater.from(getActivity()).inflate(R.layout.recyclerview_header,
+//                (ViewGroup)getActivity().findViewById(android.R.id.content),false);
+//        edtioRecyclerView.addHeaderView(header);
+        Log.i("TAG", "----->已添加头视图");
     }
-
-
 
 
     //获取网络数据
@@ -146,16 +166,16 @@ public class EdtioFragment extends Fragment implements Initerface {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     String json = response.body().string();
-                    if (JSONObject.parseObject(json).getString("data")!=null){
-                    String obj = JSONObject.parseObject(json).getString("data");
-                    if (list==null){
-                        list = JSONArray.parseArray(obj.toString(), GridBean.DataBean.class);
-                        mhandler.sendEmptyMessageDelayed(1,2000);
-                    }else{
-                        list.addAll(JSONArray.parseArray(obj.toString(), GridBean.DataBean.class));
-                        mhandler.sendEmptyMessageDelayed(3,2000);
-                    }
-                }else{
+                    if (JSONObject.parseObject(json).getString("data") != null) {
+                        String obj = JSONObject.parseObject(json).getString("data");
+                        if (list == null) {
+                            list = JSONArray.parseArray(obj.toString(), GridBean.DataBean.class);
+                            mhandler.sendEmptyMessageDelayed(1, 2000);
+                        } else {
+                            list.addAll(JSONArray.parseArray(obj.toString(), GridBean.DataBean.class));
+                            mhandler.sendEmptyMessageDelayed(3, 2000);
+                        }
+                    } else {
                         mhandler.sendEmptyMessage(4);
                     }
                 }

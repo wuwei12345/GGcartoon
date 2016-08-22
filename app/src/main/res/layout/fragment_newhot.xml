@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/edtio_pulltorefresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical" >
     <RelativeLayout
-        android:id="@+id/edtio_relativelayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
@@ -15,23 +12,18 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             >
-           <com.jcodecraeer.xrecyclerview.XRecyclerView
-               android:id="@+id/edtio_recyclerView"
-               android:layout_margin="3dp"
-               android:layout_width="match_parent"
-               android:layout_height="match_parent"/>
+            <com.jcodecraeer.xrecyclerview.XRecyclerView
+                android:id="@+id/hot_recyclerView"
+                android:layout_margin="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
         </LinearLayout>
         <ProgressBar
             android:id="@+id/pb"
-            android:visibility="invisible"
+            android:visibility="visible"
             android:layout_centerHorizontal="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </RelativeLayout>
-<TextView
-    android:visibility="gone"
-    android:id="@+id/again_loading"
-    android:text="点击重新加载"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
+
 </LinearLayout>

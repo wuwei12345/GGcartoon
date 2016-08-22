@@ -32,9 +32,9 @@ import butterknife.ButterKnife;
 import ggcartoon.yztc.com.Adapter.ManHuaXiangQingAdapter;
 import ggcartoon.yztc.com.Bean.ManHuaXiangQing;
 import ggcartoon.yztc.com.Bean.ShouCang;
-import ggcartoon.yztc.com.View.DividerItemDecoration;
 import ggcartoon.yztc.com.View.OkHttpUtils;
 import ggcartoon.yztc.com.View.SelectPicPopupWindow;
+import ggcartoon.yztc.com.View.SpaceItemDecoration;
 import ggcartoon.yztc.com.View.SwipBackActivityS;
 import ggcartoon.yztc.com.initerface.Initerface;
 import okhttp3.Call;
@@ -199,7 +199,7 @@ public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initer
         //修改背景颜色
         collapsingToolbarLayout.setBackgroundColor(Color.WHITE);
         //设置分割线
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
+        recyclerView.addItemDecoration(new SpaceItemDecoration(25));
         //布局为线性
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
@@ -218,7 +218,7 @@ public class ManHuaXiangQingActivity extends SwipBackActivityS implements Initer
                     boolean flag = true;
                     //获取数据库的内容
                     List<ShouCang> SClist = MainActivity.dbUtils.findAll(ShouCang.class);
-                    //如果不为空则挨个偏离数据库中的内容是否与要收藏的内容重复，如果重复则标志位flag为false不能收藏否则可以收藏
+                    //如果不为空则挨个遍历数据库中的内容是否与要收藏的内容重复，如果重复则标志位flag为false不能收藏否则可以收藏
                     if (SClist != null) {
                         for (ShouCang SC : SClist) {
                             if (SC.getTitle().equals(MH.getTitle())) {

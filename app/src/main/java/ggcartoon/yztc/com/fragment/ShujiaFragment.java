@@ -65,9 +65,6 @@ public class ShujiaFragment extends Fragment implements Initerface, View.OnClick
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        initview();
-//        initdata();
-//        initviewoper();
     }
 
     @Override

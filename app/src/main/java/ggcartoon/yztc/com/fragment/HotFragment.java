@@ -10,59 +10,62 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.GridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshScrollView;
+import com.jcodecraeer.xrecyclerview.ProgressStyle;
+import com.jcodecraeer.xrecyclerview.XRecyclerView;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import ggcartoon.yztc.com.Adapter.GrideAdapter;
+import ggcartoon.yztc.com.Adapter.XgrideAdapter;
 import ggcartoon.yztc.com.Bean.GridBean;
 import ggcartoon.yztc.com.Bean.Head;
-import ggcartoon.yztc.com.View.MyGirdView;
 import ggcartoon.yztc.com.View.OkHttpUtils;
+import ggcartoon.yztc.com.View.RetrofitUtils;
 import ggcartoon.yztc.com.ggcartoon.ManHuaXiangQingActivity;
 import ggcartoon.yztc.com.ggcartoon.R;
 import ggcartoon.yztc.com.initerface.Initerface;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * 热门推荐
  * A simple {@link Fragment} subclass.
  */
-public class HotFragment extends Fragment implements Initerface, ViewPager.OnPageChangeListener {
-    @Bind(R.id.Hot_MyGirdView)
-    MyGirdView HotMyGirdView;
+public class HotFragment extends Fragment implements Initerface{
+    @Bind(R.id.hot_recyclerView)
+    XRecyclerView hotRecyclerView;
+    @Bind(R.id.pb)
+    ProgressBar pb;
+    private ViewPager headVp;
+    //标题栏
+    private TextView tvTitle;
+    //    @Bind(R.id.Hot_MyGirdView)
+//    MyGirdView HotMyGirdView;
     //viewpage
-    private ViewPager mHeadvp;
     //用来存放获取的数据
     private List<Head.DataBean> list;
     //广告栏的网址
     private String vppath = "http://csapi.dm300.com:21889/android/recom/editorrecomlist?pagesize=4&platform_id=0";
-    //标题栏
-    private TextView tvTitle;
+
     private List<ImageView> imageres;
     private List<String> titleres;
     //用来存放加载的网络图片
@@ -71,9 +74,9 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
     //网络请求
     private HttpUtils http;
     //上下拉刷新
-    private PullToRefreshScrollView hotScrollView;
+//    private PullToRefreshScrollView hotScrollView;
     //初始加载
-    private ProgressBar mProgressBar;
+//    private ProgressBar mProgressBar;
     //热门漫画推荐
     private String gvPath = "http://csapi.dm300.com:21889/android/recom/hotlist?pagesize=30&page=";
     //bean
@@ -91,23 +94,37 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
                     tvTitle.setText(titleres.get(0));
                     tvTitle.setBackgroundColor(Color.argb(100, 0, 0, 0));
                     headvpadapter = new HeadvpAdapter();
-                    mHeadvp.setAdapter(headvpadapter);
+                    headVp.setAdapter(headvpadapter);
                     break;
                 case 1:
-                    mProgressBar.setVisibility(View.INVISIBLE);
+                    pb.setVisibility(View.INVISIBLE);
                     //列表中展示数据
-                    GrideAdapter adapter = new GrideAdapter(Gridelist);
-                    HotMyGirdView.setAdapter(adapter);
-                    hotScrollView.onRefreshComplete();
-                    //加载后返回到最顶部
-                    hotScrollView.getRefreshableView().fullScroll(0);
+                    XgrideAdapter adapter = new XgrideAdapter(Gridelist);
+                    hotRecyclerView.setAdapter(adapter);
+                    adapter.setonItemClickLintener(new XgrideAdapter.onItemClickLintener() {
+                        @Override
+                        public void onItemClick(View view, int position) {
+                            //跳到相应的漫画简介界面，把对应的漫画名字id传过去
+                            Intent intent = new Intent(getActivity(), ManHuaXiangQingActivity.class);
+                            intent.putExtra("comicId", Gridelist.get(position - 2).getComicId());
+                            intent.putExtra("title", Gridelist.get(position - 2).getTitle());
+                            startActivity(intent);
+                        }
+
+                        @Override
+                        public void onItemLongClick(View view, int Position) {
+
+                        }
+                    });
+                    hotRecyclerView.refreshComplete();
+                    hotRecyclerView.loadMoreComplete();
                     break;
                 case 2:
                     //adapter填充
                     tvTitle.setText(titleres.get(0));
                     tvTitle.setBackgroundColor(Color.argb(100, 0, 0, 0));
                     headvpadapter = new HeadvpAdapter();
-                    mHeadvp.setAdapter(headvpadapter);
+                    headVp.setAdapter(headvpadapter);
                     break;
                 case 3:
                     Toast.makeText(getActivity(), "网络获取失败", Toast.LENGTH_SHORT).show();
@@ -125,7 +142,8 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_hot, container, false);
+//        View view = inflater.inflate(R.layout.fragment_hot, container, false);
+        View view = inflater.inflate(R.layout.fragment_newhot, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -141,47 +159,55 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
     //初始化控件
     @Override
     public void initview() {
-        mHeadvp = (ViewPager) getActivity().findViewById(R.id.head_vp);
-//        http = new HttpUtils();
         imageres = new ArrayList<ImageView>();
         titleres = new ArrayList<String>();
-        tvTitle = (TextView) getActivity().findViewById(R.id.tv_title);
-        mProgressBar = (ProgressBar) getActivity().findViewById(R.id.hot_pb);
-        hotScrollView = (PullToRefreshScrollView) getActivity().findViewById(R.id.hot_pulltorefresh);
-        //RecyclerView初始化为网格状，3列
-//        HotRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
-        hotScrollView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener2<ScrollView>() {
+        hotRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        //设置刷新的加载和主题样式
+        hotRecyclerView.setRefreshProgressStyle(ProgressStyle.BallPulse);
+        hotRecyclerView.setLoadingMoreProgressStyle(ProgressStyle.SquareSpin);
+        //设置head
+        View Header = LayoutInflater.from(getActivity()).inflate(R.layout.recyclerview_header,
+                (ViewGroup) getActivity().findViewById(android.R.id.content), false);
+        hotRecyclerView.addHeaderView(Header);
+        headVp= (ViewPager) Header.findViewById(R.id.head_vps);
+        tvTitle = (TextView) Header.findViewById(R.id.tv_titles);
+        //viewpage的滑动监听事件
+        headVp.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPullDownToRefresh(PullToRefreshBase<ScrollView> refreshView) {
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                //加载广告标题
+                tvTitle.setText(titleres.get(position));
+                tvTitle.setBackgroundColor(Color.argb(100, 0, 0, 0));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        //刷新监听事件
+        hotRecyclerView.setLoadingListener(new XRecyclerView.LoadingListener() {
+            @Override
+            public void onRefresh() {
                 initPullRefreshData();
-                //获取导航栏展示推荐漫画
                 initHeadvpData();
             }
 
             @Override
-            public void onPullUpToRefresh(PullToRefreshBase<ScrollView> refreshView) {
+            public void onLoadMore() {
                 initPullRefreshData();
-                //获取导航栏展示推荐漫画
                 initHeadvpData();
-            }
-        });
-        HotMyGirdView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //跳到相应的漫画简介界面，把对应的漫画名字id传过去
-                Intent intent = new Intent(getActivity(), ManHuaXiangQingActivity.class);
-                intent.putExtra("comicId", Gridelist.get(position).getComicId());
-                intent.putExtra("title", Gridelist.get(position).getTitle());
-                startActivity(intent);
             }
         });
     }
 
     @Override
     public void initdata() {
-        mProgressBar.setVisibility(View.VISIBLE);
-        //上下拉刷新的初始化
-        initScrollView();
         //获取导航栏展示推荐漫画
         initHeadvpData();
         //获取漫画数据并填充
@@ -190,44 +216,61 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
 
     //获取数据
     private void initPullRefreshData() {
-        String url = gvPath + currenindex++;
-        try {
-            OkHttpUtils.run(url).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    mhandler.sendEmptyMessage(3);
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    String json = response.body().string();
+        String gvpaths="http://csapi.dm300.com:21889/android/recom/";
+        Retrofit retrofit=new Retrofit.Builder().baseUrl(gvpaths).
+                addConverterFactory(GsonConverterFactory.create()).build();
+        RetrofitUtils.HeadJK headJK=retrofit.create(RetrofitUtils.HeadJK.class);
+        Log.i("TAG","------>"+currenindex);
+        HashMap<String,String> params=new HashMap<>();
+        params.put("","");
+        retrofit2.Call<GridBean> call=headJK.repoDataBean(params);
+        call.enqueue(new retrofit2.Callback<GridBean>() {
+            @Override
+            public void onResponse(retrofit2.Call<GridBean> call, retrofit2.Response<GridBean> response) {
+                Gridelist = response.body().getData();
+//                Log.i("TAG","------>"+json);
                     try {
-                        JSONObject jsonobject = new JSONObject(json);
-                        JSONArray jsonarray = jsonobject.getJSONArray("data");
-                        Gridelist = JSON.parseArray(jsonarray.toString(), GridBean.DataBean.class);
-                    } catch (JSONException e) {
+//                        JSONObject jsonobject = new JSONObject(json);
+//                        JSONArray jsonarray = jsonobject.getJSONArray("data");
+//                        Gridelist = JSON.parseArray(jsonarray.toString(), GridBean.DataBean.class);
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    mhandler.sendEmptyMessage(1);
+                    mhandler.sendEmptyMessageDelayed(1,2000);
                 }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+            @Override
+            public void onFailure(retrofit2.Call<GridBean> call, Throwable t) {
+                mhandler.sendEmptyMessage(3);
+            }
+        });
+//        String url = gvPath + currenindex++;
+//        try {
+//            OkHttpUtils.run(url).enqueue(new Callback() {
+//                @Override
+//                public void onFailure(Call call, IOException e) {
+//                    mhandler.sendEmptyMessage(3);
+//                }
+//
+//                @Override
+//                public void onResponse(Call call, Response response) throws IOException {
+//                    String json = response.body().string();
+//                    try {
+//                        JSONObject jsonobject = new JSONObject(json);
+//                        JSONArray jsonarray = jsonobject.getJSONArray("data");
+//                        Gridelist = JSON.parseArray(jsonarray.toString(), GridBean.DataBean.class);
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                    mhandler.sendEmptyMessageDelayed(1,2000);
+//                }
+//            });
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
     }
 
-
-    //初始化上下拉刷新
-    private void initScrollView() {
-        hotScrollView.setMode(PullToRefreshBase.Mode.BOTH);
-        hotScrollView.setPullLabel("下拉刷新", PullToRefreshBase.Mode.PULL_FROM_START);
-        hotScrollView.setRefreshingLabel("正在加载...", PullToRefreshBase.Mode.PULL_FROM_START);
-        hotScrollView.setReleaseLabel("放开刷新", PullToRefreshBase.Mode.PULL_FROM_START);
-        hotScrollView.setPullLabel("上拉加载", PullToRefreshBase.Mode.PULL_FROM_END);
-        hotScrollView.setRefreshingLabel("正在加载...", PullToRefreshBase.Mode.PULL_FROM_END);
-        hotScrollView.setReleaseLabel("放开加载", PullToRefreshBase.Mode.PULL_FROM_END);
-    }
 
     //广告获取内容
     private void initHeadvpData() {
@@ -266,25 +309,6 @@ public class HotFragment extends Fragment implements Initerface, ViewPager.OnPag
     @Override
     public void initviewoper() {
         bitmapUtils = new BitmapUtils(getActivity());
-        //viewpage的滑动监听事件
-        mHeadvp.setOnPageChangeListener(this);
-    }
-
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-        //加载广告标题
-        tvTitle.setText(titleres.get(position));
-        tvTitle.setBackgroundColor(Color.argb(100, 0, 0, 0));
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-
     }
 
     @Override

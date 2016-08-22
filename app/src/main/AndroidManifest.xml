@@ -53,17 +53,11 @@
             android:name=".LoginAcitivyt"
             android:theme="@style/otherPageStyle" />
         <activity
-            android:name=".FresonDemo"
-            android:label="@string/title_activity_freson_demo" />
-        <activity
             android:name=".pulltoreshDemo"
             android:label="@string/title_activity_pulltoresh_demo" />
         <activity
             android:name="ggcartoon.yztc.com.DemoActivity"
             android:label="@string/title_activity_demo" />
-        <activity
-            android:name="ggcartoon.yztc.com.DBActiviy"
-            android:label="@string/title_activity_dbactiviy"></activity>
     </application>
 
 </manifest>

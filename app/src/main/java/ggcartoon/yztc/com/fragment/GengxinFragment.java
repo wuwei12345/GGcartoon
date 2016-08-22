@@ -7,24 +7,26 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.jcodecraeer.xrecyclerview.ProgressStyle;
+import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
 import java.io.IOException;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import ggcartoon.yztc.com.Adapter.GengxinAdapter;
 import ggcartoon.yztc.com.Bean.GengxinBean;
+import ggcartoon.yztc.com.View.DividerItemDecoration;
 import ggcartoon.yztc.com.View.OkHttpUtils;
 import ggcartoon.yztc.com.ggcartoon.ManHuaXiangQingActivity;
 import ggcartoon.yztc.com.ggcartoon.R;
@@ -33,16 +35,16 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-import static com.handmark.pulltorefresh.library.PullToRefreshBase.Mode.BOTH;
-import static com.handmark.pulltorefresh.library.PullToRefreshBase.Mode.PULL_FROM_END;
-import static com.handmark.pulltorefresh.library.PullToRefreshBase.Mode.PULL_FROM_START;
-
 /**
+ * 最近更新
  * A simple {@link Fragment} subclass.
  */
 public class GengxinFragment extends Fragment implements Initerface {
-    private PullToRefreshListView lv;
-    private ProgressBar pb;
+    @Bind(R.id.lv_gengxin)
+    XRecyclerView lvGengxin;
+    @Bind(R.id.gengxin_pb)
+    ProgressBar gengxinPb;
+    //    private PullToRefreshListView lv;
     private List<GengxinBean.DataBean> list;
     private int currentindex = 1;
     private GengxinAdapter adapter;
@@ -51,10 +53,26 @@ public class GengxinFragment extends Fragment implements Initerface {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
-                    pb.setVisibility(View.INVISIBLE);
+                    gengxinPb.setVisibility(View.INVISIBLE);
+                    adapter=new GengxinAdapter();
                     adapter.setData(list);
-                    lv.onRefreshComplete();
-                    lv.getRefreshableView().setSelection(0);
+                    lvGengxin.setAdapter(adapter);
+                    adapter.setonItemClickLintener(new GengxinAdapter.onItemClickLintener() {
+                        @Override
+                        public void onItemClick(View view, int position) {
+                            Intent intent = new Intent(getActivity(), ManHuaXiangQingActivity.class);
+                            intent.putExtra("comicId", list.get(position-1).getComicId());
+                            intent.putExtra("title", list.get(position-1).getTitle());
+                            startActivity(intent);
+                        }
+
+                        @Override
+                        public void onItemLongClick(View view, int Position) {
+
+                        }
+                    });
+                    lvGengxin.refreshComplete();
+                    lvGengxin.loadMoreComplete();
                     break;
                 case 1:
                     Toast.makeText(getActivity(), "获取网络数据失败", Toast.LENGTH_SHORT).show();
@@ -70,7 +88,9 @@ public class GengxinFragment extends Fragment implements Initerface {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_gengxin, container, false);
+        View view = inflater.inflate(R.layout.fragment_gengxin, container, false);
+        ButterKnife.bind(this, view);
+        return view;
     }
 
     @Override
@@ -83,21 +103,27 @@ public class GengxinFragment extends Fragment implements Initerface {
 
     @Override
     public void initview() {
-        adapter = new GengxinAdapter();
-        lv = (PullToRefreshListView) getActivity().findViewById(R.id.lv_gengxin);
-        pb = (ProgressBar) getActivity().findViewById(R.id.gengxin_pb);
+        //设置分割线
+        lvGengxin.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL_LIST));
+        LinearLayoutManager manager=new LinearLayoutManager(getActivity());
+        manager.setOrientation(LinearLayoutManager.VERTICAL);
+        lvGengxin.setLayoutManager(manager);
+        //设置刷新的加载和主题样式
+        lvGengxin.setRefreshProgressStyle(ProgressStyle.BallPulse);
+        lvGengxin.setLoadingMoreProgressStyle(ProgressStyle.SquareSpin);
+        lvGengxin.setLoadingListener(new XRecyclerView.LoadingListener() {
+            @Override
+            public void onRefresh() {
+                initdata();
+            }
+
+            @Override
+            public void onLoadMore() {
+                initdata();
+            }
+        });
     }
 
-    private void initListView() {
-        // TODO Auto-generated method stub
-        lv.setMode(BOTH);
-        lv.setPullLabel("下拉刷新", PULL_FROM_START);
-        lv.setRefreshingLabel("正在加载...", PULL_FROM_START);
-        lv.setReleaseLabel("放开刷新", PULL_FROM_START);
-        lv.setPullLabel("上拉加载", PULL_FROM_END);
-        lv.setRefreshingLabel("正在加载ing...", PULL_FROM_END);
-        lv.setReleaseLabel("放开刷新up...", PULL_FROM_END);
-    }
 
     @Override
     public void initdata() {
@@ -123,24 +149,12 @@ public class GengxinFragment extends Fragment implements Initerface {
 
     @Override
     public void initviewoper() {
-        initListView();
-        lv.setAdapter(adapter);
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), ManHuaXiangQingActivity.class);
-                intent.putExtra("comicId", list.get(position - 1).getComicId());
-                intent.putExtra("title", list.get(position - 1).getTitle());
-                startActivity(intent);
-            }
-        });
-        lv.setOnRefreshListener(onRefreshListener);
     }
 
-    private PullToRefreshBase.OnRefreshListener<ListView> onRefreshListener = new PullToRefreshBase.OnRefreshListener<ListView>() {
-        @Override
-        public void onRefresh(PullToRefreshBase<ListView> refreshView) {
-            initdata();
-        }
-    };
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
 }
