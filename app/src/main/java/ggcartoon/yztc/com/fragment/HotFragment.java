@@ -221,22 +221,28 @@ public class HotFragment extends Fragment implements Initerface{
                 addConverterFactory(GsonConverterFactory.create()).build();
         RetrofitUtils.HeadJK headJK=retrofit.create(RetrofitUtils.HeadJK.class);
         Log.i("TAG","------>"+currenindex);
-        HashMap<String,String> params=new HashMap<>();
-        params.put("","");
-        retrofit2.Call<GridBean> call=headJK.repoDataBean(params);
+//        HashMap<String, String> params=new HashMap<>();
+//        params.put("gid",currenindex+++" ");
+        currenindex++;
+        retrofit2.Call<GridBean> call=headJK.repoDataBean(currenindex +"");
         call.enqueue(new retrofit2.Callback<GridBean>() {
             @Override
             public void onResponse(retrofit2.Call<GridBean> call, retrofit2.Response<GridBean> response) {
-                Gridelist = response.body().getData();
 //                Log.i("TAG","------>"+json);
-                    try {
+//                    try {
 //                        JSONObject jsonobject = new JSONObject(json);
 //                        JSONArray jsonarray = jsonobject.getJSONArray("data");
 //                        Gridelist = JSON.parseArray(jsonarray.toString(), GridBean.DataBean.class);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    mhandler.sendEmptyMessageDelayed(1,2000);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                if (response.body().getData()!=null) {
+                    Gridelist = response.body().getData();
+                for (GridBean.DataBean d:Gridelist) {
+                    Log.i("TAG","--->"+d.getTitle());
+                }
+                    mhandler.sendEmptyMessageDelayed(1, 2000);
+//                }
                 }
 
             @Override
