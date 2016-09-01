@@ -31,12 +31,15 @@ import butterknife.ButterKnife;
 import ggcartoon.yztc.com.Adapter.XgrideAdapter;
 import ggcartoon.yztc.com.Bean.GridBean;
 import ggcartoon.yztc.com.View.OkHttpUtils;
+import ggcartoon.yztc.com.View.RetrofitUtils;
 import ggcartoon.yztc.com.ggcartoon.ManHuaXiangQingActivity;
 import ggcartoon.yztc.com.ggcartoon.R;
 import ggcartoon.yztc.com.initerface.Initerface;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -49,7 +52,7 @@ public class EdtioFragment extends Fragment implements Initerface {
     @Bind(R.id.again_loading)
     TextView againLoading;
     //接口请求要传的ID
-    private int currentindex = 1;
+    private int currentindex = 0;
     //加载显示
     private ProgressBar pb;
     //Bean目录
@@ -155,34 +158,59 @@ public class EdtioFragment extends Fragment implements Initerface {
     //获取网络数据
     @Override
     public void initdata() {
-        String path = "http://csapi.dm300.com:21889/android/recom/editorlist?pagesize=30&page=" + currentindex++;
-        try {
-            OkHttpUtils.run(path).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    mhandler.sendEmptyMessage(2);
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    String json = response.body().string();
-                    if (JSONObject.parseObject(json).getString("data") != null) {
-                        String obj = JSONObject.parseObject(json).getString("data");
-                        if (list == null) {
-                            list = JSONArray.parseArray(obj.toString(), GridBean.DataBean.class);
-                            mhandler.sendEmptyMessageDelayed(1, 2000);
-                        } else {
-                            list.addAll(JSONArray.parseArray(obj.toString(), GridBean.DataBean.class));
-                            mhandler.sendEmptyMessageDelayed(3, 2000);
-                        }
+        String path = "http://csapi.dm300.com:21889/android/recom/";
+        currentindex++;
+        Retrofit retrofit=new Retrofit.Builder().baseUrl(path)
+                .addConverterFactory(GsonConverterFactory.create()).build();
+        RetrofitUtils.EditJX editJX=retrofit.create(RetrofitUtils.EditJX.class);
+        retrofit2.Call<GridBean> call=editJX.repoDataBean(currentindex+"");
+        call.enqueue(new retrofit2.Callback<GridBean>() {
+            @Override
+            public void onResponse(retrofit2.Call<GridBean> call, retrofit2.Response<GridBean> response) {
+                if (response.body().getData()!=null) {
+                    if (list == null) {
+                        list = response.body().getData();
+                        mhandler.sendEmptyMessageDelayed(1, 2000);
                     } else {
-                        mhandler.sendEmptyMessage(4);
+                        list.addAll(response.body().getData());
+                        mhandler.sendEmptyMessageDelayed(3, 2000);
                     }
+                }else{
+                    mhandler.sendEmptyMessage(4);
                 }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            }
+            @Override
+            public void onFailure(retrofit2.Call<GridBean> call, Throwable t) {
+                mhandler.sendEmptyMessage(2);
+            }
+        });
+//        try {
+//            OkHttpUtils.run(path).enqueue(new Callback() {
+//                @Override
+//                public void onFailure(Call call, IOException e) {
+//                    mhandler.sendEmptyMessage(2);
+//                }
+//
+//                @Override
+//                public void onResponse(Call call, Response response) throws IOException {
+//                    String json = response.body().string();
+//                    if (JSONObject.parseObject(json).getString("data") != null) {
+//                        String obj = JSONObject.parseObject(json).getString("data");
+//                        if (list == null) {
+//                            list = JSONArray.parseArray(obj.toString(), GridBean.DataBean.class);
+//                            mhandler.sendEmptyMessageDelayed(1, 2000);
+//                        } else {
+//                            list.addAll(JSONArray.parseArray(obj.toString(), GridBean.DataBean.class));
+//                            mhandler.sendEmptyMessageDelayed(3, 2000);
+//                        }
+//                    } else {
+//                        mhandler.sendEmptyMessage(4);
+//                    }
+//                }
+//            });
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override

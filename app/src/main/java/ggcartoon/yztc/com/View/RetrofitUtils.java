@@ -14,13 +14,19 @@ import retrofit2.http.QueryMap;
  * Created by Administrator on 2016/8/18.
  */
 public class RetrofitUtils {
-   public  interface  HeadJK{
-//       ?pagesize=30&page=1
+    /**
+     * 热门连载
+     */
+    public interface HeadJK {
         @GET("hotlist?pagesize=30")
-        Call<GridBean> repoDataBean(@Query("page")String page);
-//       Call<GridBean> repoDataBean(@Path("gid") String gurid);
+        Call<GridBean> repoDataBean(@Query("page") String page);
+    }
 
-
-   }
-
+    /**
+     * 小编推荐
+     */
+    public interface EditJX {
+        @GET("editorlist?pagesize=30")
+        Call<GridBean> repoDataBean(@Query("page") String page);
+    }
 }

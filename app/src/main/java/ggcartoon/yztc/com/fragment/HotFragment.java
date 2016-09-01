@@ -78,13 +78,13 @@ public class HotFragment extends Fragment implements Initerface{
     //初始加载
 //    private ProgressBar mProgressBar;
     //热门漫画推荐
-    private String gvPath = "http://csapi.dm300.com:21889/android/recom/hotlist?pagesize=30&page=";
+//    private String gvPath = "http://csapi.dm300.com:21889/android/recom/hotlist?pagesize=30&page=";
     //bean
-    GridBean gridbena;
+//    GridBean gridbena;
     private List<GridBean.DataBean> Gridelist;
     //广告栏的adapter
     HeadvpAdapter headvpadapter;
-    int currenindex = 1;
+    int currenindex = 0;
     Handler mhandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -220,23 +220,11 @@ public class HotFragment extends Fragment implements Initerface{
         Retrofit retrofit=new Retrofit.Builder().baseUrl(gvpaths).
                 addConverterFactory(GsonConverterFactory.create()).build();
         RetrofitUtils.HeadJK headJK=retrofit.create(RetrofitUtils.HeadJK.class);
-        Log.i("TAG","------>"+currenindex);
-//        HashMap<String, String> params=new HashMap<>();
-//        params.put("gid",currenindex+++" ");
         currenindex++;
         retrofit2.Call<GridBean> call=headJK.repoDataBean(currenindex +"");
         call.enqueue(new retrofit2.Callback<GridBean>() {
             @Override
             public void onResponse(retrofit2.Call<GridBean> call, retrofit2.Response<GridBean> response) {
-//                Log.i("TAG","------>"+json);
-//                    try {
-//                        JSONObject jsonobject = new JSONObject(json);
-//                        JSONArray jsonarray = jsonobject.getJSONArray("data");
-//                        Gridelist = JSON.parseArray(jsonarray.toString(), GridBean.DataBean.class);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                if (response.body().getData()!=null) {
                     Gridelist = response.body().getData();
                 for (GridBean.DataBean d:Gridelist) {
                     Log.i("TAG","--->"+d.getTitle());
@@ -250,30 +238,6 @@ public class HotFragment extends Fragment implements Initerface{
                 mhandler.sendEmptyMessage(3);
             }
         });
-//        String url = gvPath + currenindex++;
-//        try {
-//            OkHttpUtils.run(url).enqueue(new Callback() {
-//                @Override
-//                public void onFailure(Call call, IOException e) {
-//                    mhandler.sendEmptyMessage(3);
-//                }
-//
-//                @Override
-//                public void onResponse(Call call, Response response) throws IOException {
-//                    String json = response.body().string();
-//                    try {
-//                        JSONObject jsonobject = new JSONObject(json);
-//                        JSONArray jsonarray = jsonobject.getJSONArray("data");
-//                        Gridelist = JSON.parseArray(jsonarray.toString(), GridBean.DataBean.class);
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//                    mhandler.sendEmptyMessageDelayed(1,2000);
-//                }
-//            });
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
 
     }
 
