@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,10 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.SaveListener;
+import ggcartoon.yztc.com.Bean.Person;
 import ggcartoon.yztc.com.Bean.ShouCang;
 import ggcartoon.yztc.com.ggcartoon.LoginAcitivyt;
 import ggcartoon.yztc.com.ggcartoon.MainActivity;
@@ -49,9 +54,12 @@ public class ShujiaFragment extends Fragment implements Initerface, View.OnClick
     ListView shoucangList;
     @Bind(R.id.icon_img)
     ImageView iconImg;
+    @Bind(R.id.login)
+    TextView login;
     //listview
     private List<ShouCang> list;
     private ShouCangListAdapter shouCangListAdapter;
+    private BmobUser user;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -86,6 +94,12 @@ public class ShujiaFragment extends Fragment implements Initerface, View.OnClick
     //初始化控件
     @Override
     public void initview() {
+        user = BmobUser.getCurrentUser();
+        if (user != null) {
+            login.setText(user.getUsername());
+        } else {
+            Toast.makeText(getActivity(), "未登陆", Toast.LENGTH_SHORT).show();
+        }
         iconImg = (ImageView) getActivity().findViewById(R.id.icon_img);
         shoucang = (TextView) getActivity().findViewById(R.id.shoucang);
         lishi = (TextView) getActivity().findViewById(R.id.lishi);
@@ -107,6 +121,26 @@ public class ShujiaFragment extends Fragment implements Initerface, View.OnClick
                 shouCangListAdapter.notifyDataSetChanged();
                 shoucangList.setAdapter(shouCangListAdapter);
                 weishoucang.setVisibility(View.INVISIBLE);
+                for (int i=0;i<list.size();i++){
+                    Person p=new Person();
+                    p.setUsername(user.getUsername());
+                    p.setTitle(list.get(i).getTitle());
+                    p.setComicId(list.get(i).getComicId());
+                    p.setLastCharpterTitle(list.get(i).getLastCharpterTitle());
+                    p.setThumb(list.get(i).getThumb());
+                    p.setUpdateTime(list.get(i).getUpdateTime());
+                    p.save(new SaveListener<String>() {
+                        @Override
+                        public void done(String s, BmobException e) {
+                            if(e==null){
+                                Log.i("TAG","创建数据成功：" + s);
+                            }else{
+                                Log.i("TAG","失败："+e.getMessage()+","+e.getErrorCode());
+                            }
+                        }
+                    });
+                }
+
             } else {
                 shoucangList.setVisibility(View.INVISIBLE);
             }
@@ -130,7 +164,7 @@ public class ShujiaFragment extends Fragment implements Initerface, View.OnClick
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.icon_img:
-                Intent intent=new Intent(getActivity(), LoginAcitivyt.class);
+                Intent intent = new Intent(getActivity(), LoginAcitivyt.class);
                 startActivity(intent);
                 break;
             case R.id.shoucang:

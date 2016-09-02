@@ -10,6 +10,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
+import cn.bmob.v3.Bmob;
 import ggcartoon.yztc.com.ggcartoon.R;
 
 public class ImageLoaderApplication extends Application {
@@ -34,7 +35,10 @@ public class ImageLoaderApplication extends Application {
 		builder.threadPriority(Thread.MAX_PRIORITY);//设置当前线程的优先级
 		builder.memoryCache(new WeakMemoryCache());//使用弱引用来缓存图片
 		loader.init(builder.build());//开始构建
+		//fresco初始化
 		Fresco.initialize(getApplicationContext());
+		//bmob初始化
+		Bmob.initialize(getApplicationContext(),"7b828ce48990ac517e2012f455cb4424");
 	}
 	
 }
