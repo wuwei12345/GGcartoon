@@ -3,6 +3,7 @@ package ggcartoon.yztc.com.View;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by Administrator on 2016/7/20.
@@ -19,7 +20,7 @@ public class OkHttpUtils {
     public static Call run(String uri) throws Exception {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(uri).build();
-
+//        Response response=client.newCall(request).execute();
         return client.newCall(request);
     }
 }

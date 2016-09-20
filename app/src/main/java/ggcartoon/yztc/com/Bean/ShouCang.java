@@ -32,7 +32,7 @@ public class ShouCang {
     }
 
     public ShouCang() {
-        // TODO Auto-generated constructor stub
+
     }
     public ShouCang(String comicId,String title, String updateTime, String thumb, String lastCharpterTitle) {
         super();

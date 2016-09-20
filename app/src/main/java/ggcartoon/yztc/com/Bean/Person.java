@@ -8,12 +8,21 @@ import cn.bmob.v3.BmobUser;
  */
 
 public class Person extends BmobObject{
+    int id;
     private String title;
     private String updateTime;
     private String thumb;
     private String lastCharpterTitle;
     private String comicId;
     private String username;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getUsername() {
         return username;

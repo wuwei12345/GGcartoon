@@ -17,8 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.jcodecraeer.xrecyclerview.ProgressStyle;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
@@ -30,14 +29,10 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import ggcartoon.yztc.com.Adapter.XgrideAdapter;
 import ggcartoon.yztc.com.Bean.GridBean;
-import ggcartoon.yztc.com.View.OkHttpUtils;
 import ggcartoon.yztc.com.View.RetrofitUtils;
 import ggcartoon.yztc.com.ggcartoon.ManHuaXiangQingActivity;
 import ggcartoon.yztc.com.ggcartoon.R;
 import ggcartoon.yztc.com.initerface.Initerface;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 

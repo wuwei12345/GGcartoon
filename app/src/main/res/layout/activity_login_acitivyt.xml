@@ -13,17 +13,7 @@
     android:layout_width="match_parent"
     android:layout_height="50dp"/>
 
-    <TextView
-        android:text="Welcome"
-        android:textColor="@color/heise"
-        android:textSize="40sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/inputlayout1"
-        android:layout_marginBottom="50dp"
-        android:layout_centerHorizontal="true" />
-
-<android.support.design.widget.TextInputLayout
+    <android.support.design.widget.TextInputLayout
     android:id="@+id/inputlayout1"
     android:layout_margin="5dp"
     android:layout_above="@+id/inputlayout2"
@@ -60,7 +50,8 @@
     android:text="LOGIN"
     android:textSize="18sp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" />
+    android:layout_height="wrap_content"
+    android:background="#ff99ff" />
 
     <Button
         android:id="@+id/register_btn"
@@ -70,7 +61,48 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/login_btn"
-        />
+        android:background="#33ccff" />
 
+    <RelativeLayout
+        android:id="@+id/bilibili_show"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/inputlayout1"
+        android:layout_alignParentRight="true"
+   >
+        <ImageView
+            android:background="@drawable/ic_22"
+            android:layout_alignParentLeft="true"
+            android:layout_width="120dp"
+            android:layout_height="120dp" />
+
+        <ImageView
+            android:background="@drawable/ic_33"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_alignParentRight="true"
+             />
+    </RelativeLayout>
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/bilibili_hind"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/inputlayout1"
+        android:layout_alignParentRight="true"
+        >
+        <ImageView
+            android:background="@drawable/ic_22_hide"
+            android:layout_alignParentLeft="true"
+            android:layout_width="120dp"
+            android:layout_height="120dp" />
+
+        <ImageView
+            android:background="@drawable/ic_33_hide"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_alignParentRight="true"
+            />
+    </RelativeLayout>
 
 </RelativeLayout>

@@ -1,2 +1,2 @@
-include ':app', ':roundedimageview'
+include ':app'
 include ':library'

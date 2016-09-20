@@ -7,13 +7,13 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="55dp"
         android:padding="5dp">
 
         <ImageView
             android:id="@+id/icon_img"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/login_img" />
 
         <TextView
@@ -23,25 +23,27 @@
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/icon_img"
             android:text="登录" />
+        <TextView
+            android:id="@+id/QUERT_user"
+            android:text="退出"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/login"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:orientation="horizontal">
-           <TextView
-               android:id="@+id/lishi"
-               android:text="历史"
-               android:textSize="14sp"
-               android:layout_marginRight="5dp"
+           <Button
+               android:id="@+id/synSC"
+               android:layout_margin="10dp"
+               android:background="#ffffff"
+               android:text="同步收藏"
+               android:layout_gravity="center"
                android:layout_width="wrap_content"
-               android:gravity="center"
-               android:layout_height="match_parent" />
-            <TextView
-                android:id="@+id/shoucang"
-                android:text="收藏"
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent" />
+               android:layout_height="wrap_content" />
         </LinearLayout>
     </RelativeLayout>
 
@@ -49,24 +51,29 @@
     android:src="@drawable/charpter_last_read"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" />
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/weishoucang"
-        android:text="还未收藏任何漫画"
-        android:textSize="18sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
-    <ListView
-        android:id="@+id/shoucang_list"
-        android:visibility="invisible"
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/weishoucang"
+            android:text="还未收藏任何漫画"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+        <ListView
+            android:id="@+id/shoucang_list"
+            android:visibility="invisible"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
 
 
-    </ListView>
-</RelativeLayout>
+        </ListView>
+    </RelativeLayout>
 </LinearLayout>

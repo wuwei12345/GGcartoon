@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +58,7 @@ public class TuijianFragment extends Fragment implements Initerface{
         medtioFragment=new EdtioFragment();
         mgangmanfragment=new GangmanFragment();
         mgengxinfragment=new GengxinFragment();
+
     }
 
     @Override
